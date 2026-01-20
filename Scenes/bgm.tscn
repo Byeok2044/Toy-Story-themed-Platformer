@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgjafh1bvlc5w"]
+
+[ext_resource type="AudioStream" uid="uid://dionab00mvg1j" path="res://Sounds/youve got a friend in me instrumental.mp3" id="1_2kasm"]
+
+[node name="BGM" type="AudioStreamPlayer2D"]
+stream = ExtResource("1_2kasm")
+autoplay = true

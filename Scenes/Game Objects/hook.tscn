@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://dj4kfjcimwi8s"]
+
+[ext_resource type="Texture2D" uid="uid://oppdvxdg3thj" path="res://Assets/Images/Icons/hook_ph.png" id="1_0dplr"]
+[ext_resource type="Script" uid="uid://c0f26yj601ojv" path="res://Scripts/GameObj/hook.gd" id="1_td5yl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0dplr"]
+size = Vector2(372.02432, 12.136629)
+
+[node name="hook" type="Area2D"]
+script = ExtResource("1_td5yl")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0.9999924, 26)
+scale = Vector2(0.23928571, 0.23741007)
+texture = ExtResource("1_0dplr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1.5000029, 74.5)
+scale = Vector2(1.2714223, -13.100838)
+shape = SubResource("RectangleShape2D_0dplr")

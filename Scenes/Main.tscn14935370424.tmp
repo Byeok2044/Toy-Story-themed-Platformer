@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkp0clj671tu0"]
+
+[ext_resource type="PackedScene" uid="uid://c72h5a48luqd5" path="res://Scenes/killzone.tscn" id="2_idj7w"]
+[ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/level_placeholder.tscn" id="3_kln2b"]
+
+[node name="Main" type="Node2D"]
+
+[node name="LevelPlaceholder" parent="." instance=ExtResource("3_kln2b")]
+
+[node name="Killzone" parent="." instance=ExtResource("2_idj7w")]
+position = Vector2(867, 1008)
+
+[connection signal="body_entered" from="Killzone" to="Killzone" method="_on_body_entered"]

@@ -1,0 +1,68 @@
+[gd_scene load_steps=6 format=3 uid="uid://dsc67xeet31j2"]
+
+[ext_resource type="Script" uid="uid://qvbbehja2gln" path="res://Scripts/Menu/main_menu.gd" id="1_38lf1"]
+[ext_resource type="Texture2D" uid="uid://c6ghil3pllj88" path="res://Assets/Images/Background/placeholder.png" id="2_fk7rg"]
+[ext_resource type="FontFile" uid="uid://c0l2vmig8sgyx" path="res://Assets/Fonts/Peace Sans Webfont.ttf" id="3_yllim"]
+[ext_resource type="AudioStream" uid="uid://dionab00mvg1j" path="res://Sounds/youve got a friend in me instrumental.mp3" id="4_hpof8"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ce3w2"]
+texture = ExtResource("2_fk7rg")
+modulate_color = Color(0.78775924, 0.78775924, 0.78775924, 1)
+
+[node name="Credits" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_38lf1")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_top = -5.0
+offset_right = 1153.0
+offset_bottom = 644.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_ce3w2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.0
+offset_top = -59.0
+offset_right = 152.0
+offset_bottom = 85.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.46100003
+anchor_right = 0.5
+anchor_bottom = 0.46100003
+offset_left = -110.0
+offset_top = -224.72803
+offset_right = 102.0
+offset_bottom = -170.72803
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.972549)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("3_yllim")
+theme_override_font_sizes/font_size = 38
+text = "CREDITS"
+horizontal_alignment = 1
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_hpof8")
+autoplay = true
+parameters/looping = true

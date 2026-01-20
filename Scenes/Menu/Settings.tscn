@@ -1,0 +1,103 @@
+[gd_scene load_steps=8 format=3 uid="uid://dp3f23bk0lk32"]
+
+[ext_resource type="Script" uid="uid://1335s6beali5" path="res://Scripts/Menu/settings.gd" id="1_f2des"]
+[ext_resource type="Texture2D" uid="uid://c6ghil3pllj88" path="res://Assets/Images/Background/placeholder.png" id="1_lnv33"]
+[ext_resource type="Texture2D" uid="uid://bn2yss5befycl" path="res://Assets/Images/Player/Screenshot 2026-01-20 085837.png" id="1_ng16n"]
+[ext_resource type="Texture2D" uid="uid://drauo8mf0dvi5" path="res://Assets/Images/Player/Screenshot 2026-01-20 085829.png" id="2_7rr2e"]
+[ext_resource type="FontFile" uid="uid://c0l2vmig8sgyx" path="res://Assets/Fonts/Peace Sans Webfont.ttf" id="2_ng16n"]
+[ext_resource type="AudioStream" uid="uid://dionab00mvg1j" path="res://Sounds/youve got a friend in me instrumental.mp3" id="3_7rr2e"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ce3w2"]
+texture = ExtResource("1_lnv33")
+modulate_color = Color(0.78775924, 0.78775924, 0.78775924, 1)
+
+[node name="Settings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_f2des")
+
+[node name="Swap" type="Button" parent="."]
+layout_mode = 0
+offset_left = 513.0
+offset_top = 546.0
+offset_right = 647.0
+offset_bottom = 586.0
+text = "Swap
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+light_mask = 2
+visibility_layer = 2
+custom_minimum_size = Vector2(1, 1)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -431.0
+offset_top = -505.0
+offset_right = 977.5713
+offset_bottom = 147.85712
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(0.7, 0.7)
+theme_override_constants/separation = 15
+
+[node name="PlayerSelection" type="HBoxContainer" parent="VBoxContainer"]
+light_mask = 2
+visibility_layer = 2
+layout_mode = 2
+theme_override_constants/separation = 700
+
+[node name="Woody" type="TextureRect" parent="VBoxContainer/PlayerSelection"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = ExtResource("1_ng16n")
+
+[node name="Buzz" type="TextureRect" parent="VBoxContainer/PlayerSelection"]
+layout_mode = 2
+texture = ExtResource("2_7rr2e")
+
+[node name="Panel" type="Panel" parent="."]
+show_behind_parent = true
+light_mask = 4
+visibility_layer = 4
+layout_mode = 0
+offset_left = 2.0
+offset_top = 4.0
+offset_right = 1155.0
+offset_bottom = 653.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_ce3w2")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -117.5
+offset_top = 32.0
+offset_right = 117.5
+offset_bottom = 92.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.972549)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_ng16n")
+theme_override_font_sizes/font_size = 38
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_7rr2e")
+autoplay = true
+parameters/looping = true
+
+[connection signal="pressed" from="Swap" to="." method="_on_swap_pressed"]

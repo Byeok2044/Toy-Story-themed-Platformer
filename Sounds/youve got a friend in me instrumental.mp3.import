@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dionab00mvg1j"
+path="res://.godot/imported/youve got a friend in me instrumental.mp3-9dd723bfbcc4dce301bb44ba1386a37d.mp3str"
+
+[deps]
+
+source_file="res://Sounds/youve got a friend in me instrumental.mp3"
+dest_files=["res://.godot/imported/youve got a friend in me instrumental.mp3-9dd723bfbcc4dce301bb44ba1386a37d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
