@@ -19,6 +19,10 @@ config/icon="uid://dikfdeer1k1mn"
 
 Global="*res://Scripts/Menu/global.gd"
 
+[display]
+
+window/stretch/mode="canvas_items"
+
 [input]
 
 p1_left={
