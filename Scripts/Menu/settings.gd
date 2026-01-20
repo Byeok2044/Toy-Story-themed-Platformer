@@ -1,27 +1,31 @@
 extends Control
 
-# References to the image nodes. 
-# Change 'TextureRect' to 'Sprite2D' if you are using Sprites instead.
-@onready var p1 = $p1
-@onready var p2 = $p2
+# References to the actual node names in your Settings.tscn
+@onready var woody_rect = $VBoxContainer/PlayerSelection/Woody
+@onready var buzz_rect = $VBoxContainer/PlayerSelection/Buzz
 
-# Called when the node enters the scene tree for the first time.
+var Menu_scene_path = "res://Scenes/Menu/Main_Menu.tscn"
+
 func _ready() -> void:
-	# Optional check to ensure nodes are correctly assigned
-	if not p1 or not p2:
-		print("Error: Make sure nodes named 'p1' and 'p2' exist as children.")
+	# Ensure the UI matches the current global state when the menu opens
+	if Global.players_swapped:
+		_apply_visual_swap()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
-# This function is triggered by your Button's signal
 func _on_swap_pressed() -> void:
-	# Store the first texture in a temporary variable
-	var temp_texture = p1.texture
+	# 1. Toggle the global swap state
+	Global.players_swapped = !Global.players_swapped
 	
-	# Swap the textures
-	p1.texture = p2.texture
-	p2.texture = temp_texture
+	# 2. Update the visual textures in the menu
+	_apply_visual_swap()
 	
-	print("Textures swapped successfully!")
+	print("Players swapped: ", Global.players_swapped)
+
+func _apply_visual_swap() -> void:
+	# Swaps the textures of the Woody and Buzz nodes
+	var temp_texture = woody_rect.texture
+	woody_rect.texture = buzz_rect.texture
+	buzz_rect.texture = temp_texture
+
+
+func _on_back_pressed() -> void:
+	get_tree().change_scene_to_file(Menu_scene_path)
