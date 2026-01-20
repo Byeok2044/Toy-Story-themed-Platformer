@@ -7,9 +7,9 @@ extends CharacterBody2D
 @onready var fuel_bar: ProgressBar = $"Health Bar/FuelBar"
 
 # --- Cooldown & Combat Variables ---
-@onready var shoot_timer: Timer = $ShootTimer # Ensure your scene has a Timer child node named "ShootTimer"
+@onready var shoot_timer: Timer = $ShootTimer
 @export var bullet_scene: PackedScene = preload("res://Scenes/Game Objects/buzz_bullet.tscn")
-@export var shoot_cooldown := 0.4 # Seconds between shots
+@export var shoot_cooldown := 0.4 
 var can_shoot := true
 
 # --- Constants ---
@@ -27,9 +27,21 @@ var has_tank := false
 var fuel := 0.0
 var is_floating := false
 
+# --- DEATH LOOP FIX VAR ---
+var invulnerable = false 
+
 func _ready() -> void:
-	# DYNAMIC CONTROL SWAP:
-	# By default, Buzz is P2 (Arrows). If swapped, he becomes P1 (WASD).
+	print("Spawning at: ", Global.respawn_point)
+	add_to_group("players")
+	print("Player spawned. Global.respawn_point is: ", Global.respawn_point)
+	if Global.respawn_point != null:
+		global_position = Global.respawn_point + Vector2(player_id * 20, 0)
+		print("Teleported to checkpoint!")
+		var cam = get_viewport().get_camera_2d()
+		if cam:
+			cam.global_position = global_position # Force camera to player
+			cam.reset_smoothing() # Stop it from 'sliding' from the start
+		start_invulnerability(1.5)
 	if Global.players_swapped:
 		player_id = 1
 	else:
@@ -41,7 +53,13 @@ func _ready() -> void:
 		for child in hearts_parent.get_children():
 			hearts_list.append(child)
 		health = hearts_list.size()
-		
+
+	# --- CHECKPOINT RESPAWN FIX ---
+	# Move to checkpoint immediately if set
+	if Global.respawn_point != null:
+		global_position = Global.respawn_point
+		start_invulnerability(1.5)
+
 	# Setup fuel system
 	fuel = MAX_FUEL
 	if fuel_bar:
@@ -51,13 +69,12 @@ func _ready() -> void:
 	# Setup Shoot Timer logic
 	if shoot_timer:
 		shoot_timer.one_shot = true
-		shoot_timer.timeout.connect(_on_shoot_timer_timeout)
+		if not shoot_timer.timeout.is_connected(_on_shoot_timer_timeout):
+			shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 
 func _input(event: InputEvent) -> void:
 	if not alive: return
 	
-	# Dynamically determine the shoot action based on current player_id
-	# (p2_shoot = Right Shift | p1_shoot = E)
 	var shoot_action := "p%d_shoot" % player_id
 	if event.is_action_pressed(shoot_action) and can_shoot:
 		shoot()
@@ -70,7 +87,6 @@ func shoot():
 	if shoot_timer:
 		shoot_timer.start(shoot_cooldown)
 	
-	# Instantiate and configure the bullet
 	var bullet = bullet_scene.instantiate()
 	var is_flipped = animated_sprite_2d.flip_h
 	var jump_action := "p%d_jump" % player_id
@@ -78,7 +94,7 @@ func shoot():
 	
 	bullet.shooter = self
 	
-	# Determine shooting direction dynamically based on facing and aim keys
+	# Determine shooting direction
 	var horiz_dir = -1.0 if is_flipped else 1.0
 	var vert_dir = 0.0
 	if Input.is_action_pressed(jump_action):
@@ -89,7 +105,6 @@ func shoot():
 	bullet.direction = Vector2(horiz_dir, vert_dir).normalized()
 	bullet.rotation = bullet.direction.angle() 
 
-	# Add to scene and position correctly
 	get_parent().add_child(bullet)
 	var spawn_offset = Vector2(horiz_dir * 30, vert_dir * 10)
 	bullet.global_position = global_position + spawn_offset
@@ -100,7 +115,6 @@ func _on_shoot_timer_timeout():
 func _physics_process(delta: float) -> void:
 	if not alive: return
 		
-	# Fetch dynamic actions for movement
 	var left := "p%d_left" % player_id
 	var right := "p%d_right" % player_id
 	var jump := "p%d_jump" % player_id
@@ -110,7 +124,10 @@ func _physics_process(delta: float) -> void:
 		is_floating = true
 		velocity.y = FLOAT_FORCE 
 		fuel -= delta
-		animated_sprite_2d.modulate = Color.CYAN 
+		
+		# VISUAL FIX: Preserve alpha (flashing) while applying Cyan tint
+		var current_alpha = animated_sprite_2d.modulate.a
+		animated_sprite_2d.modulate = Color(0, 1, 1, current_alpha)
 		
 		if fuel <= 0:
 			has_tank = false
@@ -119,9 +136,10 @@ func _physics_process(delta: float) -> void:
 			print("Tank empty! Lost the jetpack.")
 	else:
 		is_floating = false
-		animated_sprite_2d.modulate = Color.WHITE
+		if not invulnerable: # Only reset color if not flashing from damage
+			animated_sprite_2d.modulate = Color.WHITE
 
-	# Handle Vertical Gravity/Jumping
+	# Gravity
 	if not is_on_floor():
 		if not is_floating:
 			velocity += get_gravity() * delta
@@ -130,12 +148,12 @@ func _physics_process(delta: float) -> void:
 		if has_tank:
 			fuel = move_toward(fuel, MAX_FUEL, FUEL_REGEN_RATE * delta)
 
-	# Jump trigger logic
+	# Jump
 	if Input.is_action_just_pressed(jump) and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 		jump_sound.play()
 		
-	# Horizontal Movement
+	# Movement
 	var direction := Input.get_axis(left, right)
 	if direction != 0:
 		velocity.x = direction * SPEED
@@ -148,7 +166,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	
-	# Update UI elements
 	if fuel_bar:
 		fuel_bar.value = fuel
 		fuel_bar.visible = has_tank
@@ -160,8 +177,21 @@ func collect_tank():
 		fuel_bar.visible = true 
 	print("Buzz picked up the tank!")
 
+# --- INVULNERABILITY LOGIC ---
+func start_invulnerability(duration: float):
+	invulnerable = true
+	var tween = create_tween().set_loops(int(duration * 5))
+	tween.tween_property(animated_sprite_2d, "modulate:a", 0.5, 0.1)
+	tween.tween_property(animated_sprite_2d, "modulate:a", 1.0, 0.1)
+	
+	await get_tree().create_timer(duration).timeout
+	invulnerable = false
+	if animated_sprite_2d:
+		animated_sprite_2d.modulate.a = 1.0
+
 func take_damage():
-	if not alive: return
+	# Fix: Ignore damage if dead or invulnerable
+	if not alive or invulnerable: return
 	
 	health -= 1
 	var cam = get_viewport().get_camera_2d()
@@ -176,6 +206,7 @@ func take_damage():
 		die() 
 	else:
 		play_hurt_animation()
+		start_invulnerability(0.5)
 
 func play_hurt_animation():
 	var tween = create_tween()
@@ -189,5 +220,9 @@ func die() -> void:
 	animated_sprite_2d.play("hit")
 	set_collision_layer_value(1, false) 
 	
-	await get_tree().create_timer(2.0).timeout 
-	get_tree().reload_current_scene()
+	# CRASH FIX: Store tree reference before waiting
+	var tree = get_tree()
+	await tree.create_timer(2.0).timeout 
+	
+	if tree:
+		tree.reload_current_scene()

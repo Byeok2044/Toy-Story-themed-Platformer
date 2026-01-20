@@ -4,42 +4,64 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var jump_sound: AudioStreamPlayer2D = $"Jump sound"
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
-@onready var rope_line: Line2D = get_node_or_null("Line2D") 
 
-# --- Melee Variables ---
+# Woody-Specific Nodes
+@onready var rope_line: Line2D = get_node_or_null("Line2D") 
 @onready var melee_area: Area2D = $MeleeArea
 @onready var melee_timer: Timer = $MeleeTimer
+
 var is_attacking := false
 
-# --- Constants ---
 const SPEED = 300.0
 const JUMP_VELOCITY = -850.0
 const LASSO_RANGE = 400.0 
 const GRAVITY_MULTIPLIER = 1.5
 
-# --- State Variables ---
 var alive = true 
 var health = 5
 var hearts_list : Array = [] 
 var is_lasso_active := false
 var lasso_target_pos := Vector2.ZERO
 
+# --- Death Loop Fix ---
+var invulnerable = false 
+
 func _ready() -> void:
-	# Set ID: P1 (WASD) or P2 (Arrows) based on Global swap setting
+	add_to_group("players")
+	
+	# 1. Update player_id FIRST before using it for spawn offsets
 	player_id = 2 if Global.players_swapped else 1
 	
+	# 2. CONSOLIDATED SPAWN LOGIC
+	# We use only one block to prevent physics overlapping/teleporting
+	if Global.respawn_point != null:
+		# Apply offset (player_id * 20) to keep Woody and Buzz from overlapping
+		global_position = Global.respawn_point + Vector2(player_id * 20, 0)
+		
+		var cam = get_viewport().get_camera_2d()
+		if cam:
+			cam.global_position = global_position
+			# Note: Ensure you added 'reset_smoothing' to gamecam.gd
+			if cam.has_method("reset_smoothing"):
+				cam.reset_smoothing()
+		
+		print("Teleported to checkpoint with offset: ", global_position)
+		start_invulnerability(1.5)
+	
+	# 3. Component Setup
 	if rope_line:
 		rope_line.visible = false
 		
-	# Setup Melee Detection
 	if melee_area:
 		melee_area.monitoring = false
-		melee_area.body_entered.connect(_on_melee_hit)
-		melee_area.area_entered.connect(_on_melee_hit)
+		if not melee_area.body_entered.is_connected(_on_melee_hit):
+			melee_area.body_entered.connect(_on_melee_hit)
+		if not melee_area.area_entered.is_connected(_on_melee_hit):
+			melee_area.area_entered.connect(_on_melee_hit)
 
-	# Initialize health bar UI
 	var hearts_parent = get_node_or_null("Health Bar/HBoxContainer")
 	if hearts_parent:
+		hearts_list.clear() # Clear to prevent duplicates on reload
 		for child in hearts_parent.get_children():
 			hearts_list.append(child)
 		health = hearts_list.size()
@@ -47,7 +69,6 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not alive: return
 	
-	# Dynamically construct action names based on player_id
 	var lasso_action := "p%d_lasso" % player_id
 	var melee_action := "p%d_melee" % player_id
 	
@@ -59,26 +80,27 @@ func _input(event: InputEvent) -> void:
 
 func perform_melee():
 	is_attacking = true
-	melee_area.monitoring = true
+	if melee_area:
+		melee_area.monitoring = true
+		melee_area.position.x = -40 if animated_sprite_2d.flip_h else 40
 	
-	# Visual Punch Effect using Tween
 	var tween = create_tween()
-	var original_scale = animated_sprite_2d.scale
+	var original_scale = Vector2(1, 1)
 	var punch_scale = Vector2(original_scale.x * 1.4, original_scale.y * 0.8)
 	tween.tween_property(animated_sprite_2d, "scale", punch_scale, 0.1)
 	tween.tween_property(animated_sprite_2d, "scale", original_scale, 0.1)
 	
-	# Position the hit area based on Woody's flip status
-	melee_area.position.x = -40 if animated_sprite_2d.flip_h else 40
+	if melee_timer:
+		melee_timer.start()
+		await melee_timer.timeout
+	else:
+		await get_tree().create_timer(0.3).timeout
 	
-	melee_timer.start()
-	await melee_timer.timeout
-	
-	melee_area.monitoring = false
+	if melee_area:
+		melee_area.monitoring = false
 	is_attacking = false
 
 func _on_melee_hit(target_node):
-	# Hits both Ground (Area2D) and Flying (CharacterBody2D) enemies
 	if target_node.is_in_group("enemies") and target_node.has_method("take_damage"):
 		target_node.take_damage(1)
 
@@ -100,31 +122,26 @@ func try_lasso():
 func _physics_process(delta: float) -> void:
 	if not alive: return
 
-	# Fetch dynamic actions
 	var jump := "p%d_jump" % player_id
 	var left := "p%d_left" % player_id
 	var right := "p%d_right" % player_id
 
 	if is_lasso_active:
-		# Lasso Swinging Physics
 		var radius_vec = global_position - lasso_target_pos
 		var current_dist = radius_vec.length()
 		velocity.y += get_gravity().y * delta * GRAVITY_MULTIPLIER
 		var input_dir = Input.get_axis(left, right)
 		velocity.x += input_dir * SPEED * delta * 2.0
 		
-		# Constraint logic to keep Woody at a distance
 		if current_dist > 50: 
 			var angle_dir = radius_vec.normalized()
 			if velocity.dot(angle_dir) > 0:
 				velocity -= angle_dir * velocity.dot(angle_dir)
 				
-		# Release lasso with Jump action
 		if Input.is_action_just_pressed(jump):
 			is_lasso_active = false
 			velocity.y = JUMP_VELOCITY 
 	else:
-		# Standard Movement
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 			if not is_attacking:
@@ -152,13 +169,25 @@ func _process(_delta: float) -> void:
 		if is_lasso_active:
 			rope_line.visible = true
 			rope_line.clear_points()
-			rope_line.add_point(Vector2.ZERO) 
+			rope_line.add_point(Vector2.ZERO)
 			rope_line.add_point(to_local(lasso_target_pos))
 		else:
 			rope_line.visible = false
 
+func start_invulnerability(duration: float):
+	invulnerable = true
+	var tween = create_tween().set_loops(int(duration * 5))
+	tween.tween_property(animated_sprite_2d, "modulate:a", 0.5, 0.1)
+	tween.tween_property(animated_sprite_2d, "modulate:a", 1.0, 0.1)
+	
+	await get_tree().create_timer(duration).timeout
+	invulnerable = false
+	if animated_sprite_2d:
+		animated_sprite_2d.modulate.a = 1.0
+
 func take_damage():
-	if not alive: return
+	if not alive or invulnerable: return
+	
 	health -= 1
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("apply_shake"):
@@ -167,9 +196,10 @@ func take_damage():
 		var heart = hearts_list.pop_back()
 		heart.queue_free()
 	if health <= 0:
-		die() 
+		die()
 	else:
 		play_hurt_animation()
+		start_invulnerability(0.5)
 
 func play_hurt_animation():
 	var tween = create_tween()
@@ -179,9 +209,12 @@ func play_hurt_animation():
 func die() -> void:
 	if not alive: return
 	alive = false
-	is_lasso_active = false 
 	death_sound.play()
 	animated_sprite_2d.play("hit")
-	set_collision_layer_value(1, false) 
-	await get_tree().create_timer(2.0).timeout 
-	get_tree().reload_current_scene()
+	set_collision_layer_value(1, false)
+	
+	var tree = get_tree()
+	await tree.create_timer(2.0).timeout
+	
+	if tree:
+		tree.reload_current_scene()

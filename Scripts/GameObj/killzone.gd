@@ -8,4 +8,7 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _on_timer_timeout() -> void:
 	Engine.time_scale = 1.0
-	get_tree().reload_current_scene()
+	# Safe reload check
+	var tree = get_tree()
+	if tree:
+		tree.reload_current_scene()

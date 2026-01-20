@@ -5,10 +5,10 @@ extends Camera2D
 
 @export_group("Limits")
 @export var use_limits := true
-@export var limit_left_val := -500
-@export var limit_top_val := -1000
-@export var limit_right_val := 4000
-@export var limit_bottom_val := 1000
+@export var limit_left_val := -5000
+@export var limit_top_val := -10000
+@export var limit_right_val := 40000
+@export var limit_bottom_val := 10000
 
 @export_group("Zoom Settings")
 @export var min_zoom := 0.5
