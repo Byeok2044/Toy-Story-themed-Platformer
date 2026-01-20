@@ -635,6 +635,9 @@ position = Vector2(374, 10)
 [node name="ShootingEnemy" parent="Enemies" groups=["enemies"] instance=ExtResource("9_wiopy")]
 position = Vector2(831, 492)
 
+[node name="ShootingEnemy2" parent="Enemies" groups=["enemies"] instance=ExtResource("9_wiopy")]
+position = Vector2(479, 494)
+
 [node name="FlyingEnemy" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
 position = Vector2(1535, 125)
 
@@ -680,6 +683,9 @@ position = Vector2(1352, -292)
 [node name="Spikes2" parent="SpikesGroup (1x4)" instance=ExtResource("3_ytae3")]
 position = Vector2(-32, 648)
 
+[node name="Spikes4" parent="SpikesGroup (1x4)" instance=ExtResource("3_ytae3")]
+position = Vector2(177, 505)
+
 [node name="Spikes3" parent="SpikesGroup (1x4)" instance=ExtResource("3_ytae3")]
 position = Vector2(223, 505)
 
@@ -687,13 +693,22 @@ position = Vector2(223, 505)
 position = Vector2(1352, -292)
 
 [node name="Spikes2" parent="SpikesGroup (1x4)2" instance=ExtResource("3_ytae3")]
-position = Vector2(175, 505)
+position = Vector2(401, 505)
 
 [node name="Spikes3" parent="SpikesGroup (1x4)2" instance=ExtResource("3_ytae3")]
 position = Vector2(450, 505)
 
-[node name="Spikes4" parent="SpikesGroup (1x4)2" instance=ExtResource("3_ytae3")]
-position = Vector2(402, 505)
+[node name="SpikesGroup (1x4)3" type="Node2D" parent="."]
+position = Vector2(1352, -292)
+
+[node name="Spikes2" parent="SpikesGroup (1x4)3" instance=ExtResource("3_ytae3")]
+position = Vector2(682, 505)
+
+[node name="Spikes3" parent="SpikesGroup (1x4)3" instance=ExtResource("3_ytae3")]
+position = Vector2(-78, 648)
+
+[node name="Spikes4" parent="SpikesGroup (1x4)3" instance=ExtResource("3_ytae3")]
+position = Vector2(634, 505)
 
 [node name="hook" parent="." groups=["hooks"] instance=ExtResource("6_e3xn0")]
 position = Vector2(281, 233)

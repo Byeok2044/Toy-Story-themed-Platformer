@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # Constants and Variables
-const speed = 50.0
+const speed = 80.0
 @export var health: int = 3
 @export var player_id := 2 # Useful if you need to identify players
 
@@ -63,7 +63,7 @@ func handle_animation():
 	elif velocity.x > 0:
 		animated_sprite_2d.flip_h = false
 
-func take_damage(amount: int):
+func take_damage(amount: int = 1):
 	if not alive: return
 	
 	health -= amount
@@ -115,6 +115,9 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 		dir = choose([Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN])
 
 func _on_hitbox_body_entered(body: Node2D) -> void:
+	if not alive: 
+		return
+
 	if body.is_in_group("players") and body.has_method("take_damage"):
 		body.take_damage()
 		# Knockback effect on the bat when it hits a player
