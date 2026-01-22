@@ -1,45 +1,55 @@
 extends Area2D
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
-
-signal player_damaged 
+@onready var floor_detector: RayCast2D = get_node_or_null("RayCast2D")
 
 const SPEED = 100.0
-var direction = -1.0
-var health = 3 # Added health
+const LEDGE_NUDGE = 15.0 
 
-func _process(delta: float) -> void:
+var direction: float = -1.0
+var health: int = 3
+var is_locked_to_edge: bool = false 
+
+func _physics_process(delta: float) -> void:
+	if not floor_detector:
+		return
+
 	position.x += direction * SPEED * delta
-
-func _on_timer_timeout() -> void:
-	direction *= -1
-	animated_sprite_2d.flip_h = !animated_sprite_2d.flip_h
-
-# This function is called by Buzz's laser
-func take_damage(amount: int):
-	health -= amount
-	print("Enemy hit! Health remaining: ", health)
 	
-	# Visual feedback for taking damage
+	floor_detector.force_raycast_update()
+	
+	var ledge_detected = not floor_detector.is_colliding()
+	
+	if ledge_detected:
+		if not is_locked_to_edge:
+			_flip_enemy()
+			is_locked_to_edge = true 
+	else:
+		is_locked_to_edge = false
+
+func _flip_enemy() -> void:
+	direction *= -1.0
+	animated_sprite_2d.flip_h = (direction > 0)
+	
+	floor_detector.position.x = abs(floor_detector.position.x) * direction
+	
+	position.x += direction * LEDGE_NUDGE
+	
+	floor_detector.force_raycast_update()
+
+func take_damage(amount: int) -> void:
+	health -= amount
 	var flash_tween = create_tween()
 	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.RED, 0.1)
 	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.WHITE, 0.1)
-	
 	if health <= 0:
 		die()
 
 func _on_body_entered(body: Node2D) -> void:
 	if (body.name == "Buzz" or body.name == "Woody") and body.get("alive"):
-		# Keep player collision logic if you still want enemies to hurt players
 		if body.has_method("take_damage"):
 			body.take_damage()
-			player_damaged.emit()
 
-func die():
-	set_deferred("monitoring", false)
-	set_deferred("monitorable", false)
-	if animated_sprite_2d.sprite_frames.has_animation("hit"):
-		animated_sprite_2d.play("hit")
-		await animated_sprite_2d.animation_finished
-	
+func die() -> void:
+	set_physics_process(false)
 	queue_free()

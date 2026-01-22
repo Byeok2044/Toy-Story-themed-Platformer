@@ -7,7 +7,6 @@ var shooter: Node2D = null
 func _process(delta: float) -> void:
 	position += direction * speed * delta
 
-# Connect this signal in the Godot Editor
 func _on_area_entered(area: Area2D) -> void:
 	if area == shooter: return
 	

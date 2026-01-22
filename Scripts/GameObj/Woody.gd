@@ -5,7 +5,7 @@ extends CharacterBody2D
 @onready var jump_sound: AudioStreamPlayer2D = $"Jump sound"
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
 
-# Woody-Specific Nodes
+
 @onready var rope_line: Line2D = get_node_or_null("Line2D") 
 @onready var melee_area: Area2D = $MeleeArea
 @onready var melee_timer: Timer = $MeleeTimer
@@ -13,7 +13,7 @@ extends CharacterBody2D
 var is_attacking := false
 
 const SPEED = 300.0
-const JUMP_VELOCITY = -850.0
+const JUMP_VELOCITY = -900.0
 const LASSO_RANGE = 400.0 
 const GRAVITY_MULTIPLIER = 1.5
 
@@ -22,33 +22,25 @@ var health = 5
 var hearts_list : Array = [] 
 var is_lasso_active := false
 var lasso_target_pos := Vector2.ZERO
-
-# --- Death Loop Fix ---
 var invulnerable = false 
 
 func _ready() -> void:
 	add_to_group("players")
 	
-	# 1. Update player_id FIRST before using it for spawn offsets
 	player_id = 2 if Global.players_swapped else 1
 	
-	# 2. CONSOLIDATED SPAWN LOGIC
-	# We use only one block to prevent physics overlapping/teleporting
 	if Global.respawn_point != null:
-		# Apply offset (player_id * 20) to keep Woody and Buzz from overlapping
 		global_position = Global.respawn_point + Vector2(player_id * 20, 0)
 		
 		var cam = get_viewport().get_camera_2d()
 		if cam:
 			cam.global_position = global_position
-			# Note: Ensure you added 'reset_smoothing' to gamecam.gd
 			if cam.has_method("reset_smoothing"):
 				cam.reset_smoothing()
 		
 		print("Teleported to checkpoint with offset: ", global_position)
 		start_invulnerability(1.5)
 	
-	# 3. Component Setup
 	if rope_line:
 		rope_line.visible = false
 		
@@ -61,7 +53,7 @@ func _ready() -> void:
 
 	var hearts_parent = get_node_or_null("Health Bar/HBoxContainer")
 	if hearts_parent:
-		hearts_list.clear() # Clear to prevent duplicates on reload
+		hearts_list.clear() 
 		for child in hearts_parent.get_children():
 			hearts_list.append(child)
 		health = hearts_list.size()

@@ -1,33 +1,61 @@
 extends CharacterBody2D
 
-# Constants and Variables
 const speed = 80.0
+const RETURN_SPEED = 100.0
 @export var health: int = 3
-@export var player_id := 2 # Useful if you need to identify players
+@export var max_distance: float = 400.0 
+@export var flip_cooldown: float = 0.5 
+@export var damage_tick_rate: float = 1.0 
 
 var dir: Vector2
 var is_bat_chase: bool = false
 var target: CharacterBody2D = null
 var alive: bool = true
+var home_position: Vector2
+var last_flip_time: float = 0.0 
+var bodies_in_hitbox: Array[Node2D] = [] 
+var last_damage_tick: float = 0.0 
 
-# Node References
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var timer: Timer = $Timer
 
 func _ready():
-	# Automatically add to enemies group so the laser can hit it
+	home_position = global_position
 	add_to_group("enemies")
 	timer.start()
 
-func _process(delta):
+func _process(_delta):
 	if not alive: return
 	
-	# Find the nearest player every frame if in chase mode
-	if is_bat_chase:
-		target = find_nearest_player()
+	var dist_from_home = global_position.distance_to(home_position)
 	
-	move(delta)
+	if dist_from_home > max_distance:
+		is_bat_chase = false 
+		target = null
+	
+	if is_bat_chase and dist_from_home <= max_distance:
+		target = find_nearest_player()
+	else:
+		target = null
+	
 	handle_animation()
+
+func _physics_process(delta):
+	if not alive: return
+	
+	if bodies_in_hitbox.size() > 0:
+		var current_time = Time.get_ticks_msec() / 1000.0
+		if current_time - last_damage_tick >= damage_tick_rate:
+			apply_tick_damage()
+			last_damage_tick = current_time
+			
+	move(delta)
+
+func apply_tick_damage():
+	for body in bodies_in_hitbox:
+		if body.is_in_group("players") and body.has_method("take_damage"):
+			body.take_damage()
+			velocity = global_position.direction_to(body.global_position) * -100
 
 func find_nearest_player():
 	var players = get_tree().get_nodes_in_group("players")
@@ -42,12 +70,14 @@ func find_nearest_player():
 			
 	return nearest_player
 
-func move(delta):
-	if is_bat_chase and target: 
-		# Use global_position for more accurate direction tracking
+func move(_delta):
+	var dist_from_home = global_position.distance_to(home_position)
+	
+	if target and is_bat_chase:
 		velocity = global_position.direction_to(target.global_position) * speed
-	elif !is_bat_chase:
-		# Wander movement
+	elif dist_from_home > 50.0: 
+		velocity = global_position.direction_to(home_position) * RETURN_SPEED
+	else:
 		velocity = dir * speed
 		
 	move_and_slide()
@@ -57,19 +87,17 @@ func handle_animation():
 	
 	animated_sprite_2d.play("fly")
 	
-	# Flip sprite based on movement direction
-	if velocity.x < 0:
-		animated_sprite_2d.flip_h = true
-	elif velocity.x > 0:
-		animated_sprite_2d.flip_h = false
+	if abs(velocity.x) > 2.0:
+		var current_time = Time.get_ticks_msec() / 1000.0
+		var wants_to_flip = (velocity.x < 0) != animated_sprite_2d.flip_h
+		
+		if wants_to_flip and (current_time - last_flip_time) >= flip_cooldown:
+			animated_sprite_2d.flip_h = (velocity.x < 0)
+			last_flip_time = current_time
 
 func take_damage(amount: int = 1):
 	if not alive: return
-	
 	health -= amount
-	print("Bat hit! Health remaining: ", health)
-	
-	# Visual feedback (Flashing Red)
 	var flash_tween = create_tween()
 	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.RED, 0.1)
 	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.WHITE, 0.1)
@@ -80,13 +108,11 @@ func take_damage(amount: int = 1):
 func die():
 	if not alive: return
 	alive = false
-	
-	# Stop movement and collisions
 	velocity = Vector2.ZERO
-	set_collision_layer_value(1, false)
-	set_collision_mask_value(1, false)
+	bodies_in_hitbox.clear()
+	collision_layer = 0
+	collision_mask = 0
 	
-	# Play hit/death animation if it exists
 	if animated_sprite_2d.sprite_frames.has_animation("die"):
 		animated_sprite_2d.play("die")
 		await animated_sprite_2d.animation_finished
@@ -94,31 +120,28 @@ func die():
 	queue_free()
 
 func _on_timer_timeout() -> void:
-	timer.wait_time = choose([1.0, 1.5, 2.0])
+	timer.wait_time = randf_range(1.5, 3.5)
 	if !is_bat_chase:
-		dir = choose([Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN])
+		dir = [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN, Vector2.ZERO].pick_random()
 
-func choose(array):
-	array.shuffle()
-	return array.front()
-
-# --- Signal Connections ---
 
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("players"):
 		is_bat_chase = true
-		print("Bat started chasing: ", body.name)
 
 func _on_detection_area_body_exited(body: Node2D) -> void:
 	if body.is_in_group("players"):
 		is_bat_chase = false
-		dir = choose([Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN])
+		target = null
 
 func _on_hitbox_body_entered(body: Node2D) -> void:
-	if not alive: 
-		return
+	if not alive: return
+	if body.is_in_group("players"):
+		if not bodies_in_hitbox.has(body):
+			bodies_in_hitbox.append(body)
+			apply_tick_damage()
+			last_damage_tick = Time.get_ticks_msec() / 1000.0
 
-	if body.is_in_group("players") and body.has_method("take_damage"):
-		body.take_damage()
-		# Knockback effect on the bat when it hits a player
-		velocity = global_position.direction_to(body.global_position) * -200
+func _on_hitbox_body_exited(body: Node2D) -> void:
+	if bodies_in_hitbox.has(body):
+		bodies_in_hitbox.erase(body)

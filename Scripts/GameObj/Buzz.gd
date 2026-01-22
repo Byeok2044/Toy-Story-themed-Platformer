@@ -6,20 +6,17 @@ extends CharacterBody2D
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
 @onready var fuel_bar: ProgressBar = $"Health Bar/FuelBar"
 
-# --- Cooldown & Combat Variables ---
 @onready var shoot_timer: Timer = $ShootTimer
 @export var bullet_scene: PackedScene = preload("res://Scenes/Game Objects/buzz_bullet.tscn")
 @export var shoot_cooldown := 0.4 
 var can_shoot := true
 
-# --- Constants ---
 const SPEED = 300.0
-const JUMP_VELOCITY = -850.0
+const JUMP_VELOCITY = -900.0
 const FLOAT_FORCE = -400.0 
 const MAX_FUEL = 0.9        
 const FUEL_REGEN_RATE = 0.5
 
-# --- State Variables ---
 var alive = true 
 var health = 5
 var hearts_list : Array = [] 
@@ -27,7 +24,7 @@ var has_tank := false
 var fuel := 0.0
 var is_floating := false
 
-# --- DEATH LOOP FIX VAR ---
+
 var invulnerable = false 
 
 func _ready() -> void:
@@ -39,34 +36,28 @@ func _ready() -> void:
 		print("Teleported to checkpoint!")
 		var cam = get_viewport().get_camera_2d()
 		if cam:
-			cam.global_position = global_position # Force camera to player
-			cam.reset_smoothing() # Stop it from 'sliding' from the start
+			cam.global_position = global_position 
+			cam.reset_smoothing() 
 		start_invulnerability(1.5)
 	if Global.players_swapped:
 		player_id = 1
 	else:
 		player_id = 2
 		
-	# Setup health UI
 	var hearts_parent = get_node_or_null("Health Bar/HBoxContainer")
 	if hearts_parent:
 		for child in hearts_parent.get_children():
 			hearts_list.append(child)
 		health = hearts_list.size()
-
-	# --- CHECKPOINT RESPAWN FIX ---
-	# Move to checkpoint immediately if set
 	if Global.respawn_point != null:
 		global_position = Global.respawn_point
 		start_invulnerability(1.5)
 
-	# Setup fuel system
 	fuel = MAX_FUEL
 	if fuel_bar:
 		fuel_bar.visible = false
 		fuel_bar.max_value = MAX_FUEL
 		
-	# Setup Shoot Timer logic
 	if shoot_timer:
 		shoot_timer.one_shot = true
 		if not shoot_timer.timeout.is_connected(_on_shoot_timer_timeout):
@@ -82,7 +73,6 @@ func _input(event: InputEvent) -> void:
 func shoot():
 	if not bullet_scene: return
 	
-	# Start Cooldown
 	can_shoot = false
 	if shoot_timer:
 		shoot_timer.start(shoot_cooldown)
@@ -94,7 +84,6 @@ func shoot():
 	
 	bullet.shooter = self
 	
-	# Determine shooting direction
 	var horiz_dir = -1.0 if is_flipped else 1.0
 	var vert_dir = 0.0
 	if Input.is_action_pressed(jump_action):
@@ -119,13 +108,11 @@ func _physics_process(delta: float) -> void:
 	var right := "p%d_right" % player_id
 	var jump := "p%d_jump" % player_id
 
-	# Jetpack / Float logic
 	if has_tank and Input.is_action_pressed(jump) and not is_on_floor() and fuel > 0:
 		is_floating = true
 		velocity.y = FLOAT_FORCE 
 		fuel -= delta
 		
-		# VISUAL FIX: Preserve alpha (flashing) while applying Cyan tint
 		var current_alpha = animated_sprite_2d.modulate.a
 		animated_sprite_2d.modulate = Color(0, 1, 1, current_alpha)
 		
@@ -136,10 +123,9 @@ func _physics_process(delta: float) -> void:
 			print("Tank empty! Lost the jetpack.")
 	else:
 		is_floating = false
-		if not invulnerable: # Only reset color if not flashing from damage
+		if not invulnerable: 
 			animated_sprite_2d.modulate = Color.WHITE
 
-	# Gravity
 	if not is_on_floor():
 		if not is_floating:
 			velocity += get_gravity() * delta
@@ -148,12 +134,10 @@ func _physics_process(delta: float) -> void:
 		if has_tank:
 			fuel = move_toward(fuel, MAX_FUEL, FUEL_REGEN_RATE * delta)
 
-	# Jump
 	if Input.is_action_just_pressed(jump) and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 		jump_sound.play()
 		
-	# Movement
 	var direction := Input.get_axis(left, right)
 	if direction != 0:
 		velocity.x = direction * SPEED
@@ -177,7 +161,6 @@ func collect_tank():
 		fuel_bar.visible = true 
 	print("Buzz picked up the tank!")
 
-# --- INVULNERABILITY LOGIC ---
 func start_invulnerability(duration: float):
 	invulnerable = true
 	var tween = create_tween().set_loops(int(duration * 5))
@@ -190,7 +173,6 @@ func start_invulnerability(duration: float):
 		animated_sprite_2d.modulate.a = 1.0
 
 func take_damage():
-	# Fix: Ignore damage if dead or invulnerable
 	if not alive or invulnerable: return
 	
 	health -= 1
@@ -220,7 +202,6 @@ func die() -> void:
 	animated_sprite_2d.play("hit")
 	set_collision_layer_value(1, false) 
 	
-	# CRASH FIX: Store tree reference before waiting
 	var tree = get_tree()
 	await tree.create_timer(2.0).timeout 
 	

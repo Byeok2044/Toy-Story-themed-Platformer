@@ -8,4 +8,4 @@ position = Vector2(8, 434)
 script = ExtResource("1_kln2b")
 
 [node name="LevelPlaceholder" parent="." instance=ExtResource("3_kln2b")]
-position = Vector2(326, -961)
+position = Vector2(853, -680)

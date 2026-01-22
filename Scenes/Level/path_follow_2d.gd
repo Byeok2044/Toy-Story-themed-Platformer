@@ -8,4 +8,4 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	progress_ratio += delta * 0.15
+	progress_ratio += delta * 0.25
