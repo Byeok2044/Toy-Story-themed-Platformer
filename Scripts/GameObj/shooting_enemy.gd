@@ -8,6 +8,7 @@ extends Area2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var muzzle: Marker2D = $Muzzle
 @onready var wall_detector: RayCast2D = $RayCast2D
+@onready var ledge_detector: RayCast2D = $LedgeDetector 
 
 signal player_damaged
 
@@ -15,7 +16,7 @@ var direction: float = -1.0
 
 func _process(delta: float) -> void:
 	position.x += direction * speed * delta
-	if wall_detector.is_colliding():
+	if wall_detector.is_colliding() or not ledge_detector.is_colliding():
 		flip_enemy()
 
 func flip_enemy() -> void:
@@ -25,6 +26,7 @@ func flip_enemy() -> void:
 	shoot_direction = Vector2(direction, 0)
 	wall_detector.target_position.x *= -1
 	wall_detector.position.x *= -1
+	ledge_detector.position.x *= -1
 
 func _on_shot_timer_timeout() -> void:
 	shoot()

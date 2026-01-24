@@ -5,7 +5,9 @@ const RETURN_SPEED = 100.0
 @export var health: int = 3
 @export var max_distance: float = 400.0 
 @export var flip_cooldown: float = 0.5 
-@export var damage_tick_rate: float = 1.0 
+@export var contact_damage_interval := 0.6
+var damage_cooldowns := {} 
+
 
 var dir: Vector2
 var is_bat_chase: bool = false
@@ -14,7 +16,7 @@ var alive: bool = true
 var home_position: Vector2
 var last_flip_time: float = 0.0 
 var bodies_in_hitbox: Array[Node2D] = [] 
-var last_damage_tick: float = 0.0 
+
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var timer: Timer = $Timer
@@ -42,19 +44,30 @@ func _process(_delta):
 
 func _physics_process(delta):
 	if not alive: return
-	
-	if bodies_in_hitbox.size() > 0:
-		var current_time = Time.get_ticks_msec() / 1000.0
-		if current_time - last_damage_tick >= damage_tick_rate:
-			apply_tick_damage()
-			last_damage_tick = current_time
-			
+	deal_contact_damage()
 	move(delta)
 
-func apply_tick_damage():
-	for body in bodies_in_hitbox:
-		if body.is_in_group("players") and body.has_method("take_damage"):
+func deal_contact_damage():
+	var now := Time.get_ticks_msec() / 1000.0
+
+	for body in bodies_in_hitbox.duplicate():
+		if not is_instance_valid(body):
+			bodies_in_hitbox.erase(body)
+			damage_cooldowns.erase(body)
+			continue
+
+		if not body.is_in_group("players") or not body.get("alive"):
+			continue
+
+		var next_time = damage_cooldowns.get(body, 0.0)
+		if now < next_time:
+			continue
+
+		if body.has_method("take_damage"):
 			body.take_damage()
+			damage_cooldowns[body] = now + contact_damage_interval
+
+
 			velocity = global_position.direction_to(body.global_position) * -100
 
 func find_nearest_player():
@@ -124,7 +137,6 @@ func _on_timer_timeout() -> void:
 	if !is_bat_chase:
 		dir = [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN, Vector2.ZERO].pick_random()
 
-
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("players"):
 		is_bat_chase = true
@@ -139,9 +151,8 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("players"):
 		if not bodies_in_hitbox.has(body):
 			bodies_in_hitbox.append(body)
-			apply_tick_damage()
-			last_damage_tick = Time.get_ticks_msec() / 1000.0
+		damage_cooldowns[body] = 0.0 
 
 func _on_hitbox_body_exited(body: Node2D) -> void:
-	if bodies_in_hitbox.has(body):
-		bodies_in_hitbox.erase(body)
+	bodies_in_hitbox.erase(body)
+	damage_cooldowns.erase(body)
