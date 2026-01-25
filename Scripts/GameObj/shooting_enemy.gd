@@ -22,25 +22,18 @@ signal player_damaged
 var direction: float = -1.0
 
 func _ready() -> void:
-	# Check if wall_detector exists to prevent null errors
 	if wall_detector:
 		var players = get_tree().get_nodes_in_group("players")
 		for player in players:
-			# Only add the exception if the object is a physics body (CharacterBody2D/Area2D)
 			if player is CollisionObject2D:
 				wall_detector.add_exception(player)
 	else:
 		print("Warning: WallDetector node not found. Check your scene tree names.")
 
 func _process(delta: float) -> void:
-	# Movement logic
 	position.x += direction * speed * delta
-	
-	# Flip if hitting a wall (that isn't the player) or reaching a ledge
 	if wall_detector.is_colliding() or not ledge_detector.is_colliding():
 		flip_enemy()
-	
-	# Handle continuous damage for anyone staying in the hitbox
 	deal_contact_damage()
 
 func deal_contact_damage():

@@ -44,18 +44,13 @@ func _on_pause_pressed() -> void:
 	toggle_pause()
 
 func toggle_pause() -> void:
-	# Toggle the engine's pause state
+	# 1. Toggle the engine's pause state
 	get_tree().paused = not get_tree().paused
-	
-	# Show/Hide the menu based on pause state
 	if pause_menu:
 		pause_menu.visible = get_tree().paused
-	
-	# Update the main pause button text/visibility
-	if get_tree().paused:
-		pause_button.text = "Resume"
-	else:
-		pause_button.text = "Pause"
+		
+	if pause_button:
+		pause_button.visible = not get_tree().paused
 
 func _on_resume_pressed() -> void:
 	toggle_pause()
