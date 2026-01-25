@@ -1,23 +1,71 @@
 extends Area2D
 
+# Exported Variables
 @export var laser_scene: PackedScene = preload("res://Scenes/Game Objects/laser.tscn")
 @export var shoot_direction: Vector2 = Vector2.LEFT 
 @export var health: int = 3 
 @export var speed: float = 100.0
 
+# Contact Damage Settings
+@export var contact_damage_interval := 0.6
+var damage_cooldowns := {}
+var bodies_in_hitbox: Array[Node2D] = []
+
+# Node References
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var muzzle: Marker2D = $Muzzle
-@onready var wall_detector: RayCast2D = $RayCast2D
+@onready var wall_detector: RayCast2D = $WallDetector
 @onready var ledge_detector: RayCast2D = $LedgeDetector 
 
 signal player_damaged
 
 var direction: float = -1.0
 
+func _ready() -> void:
+	# Check if wall_detector exists to prevent null errors
+	if wall_detector:
+		var players = get_tree().get_nodes_in_group("players")
+		for player in players:
+			# Only add the exception if the object is a physics body (CharacterBody2D/Area2D)
+			if player is CollisionObject2D:
+				wall_detector.add_exception(player)
+	else:
+		print("Warning: WallDetector node not found. Check your scene tree names.")
+
 func _process(delta: float) -> void:
+	# Movement logic
 	position.x += direction * speed * delta
+	
+	# Flip if hitting a wall (that isn't the player) or reaching a ledge
 	if wall_detector.is_colliding() or not ledge_detector.is_colliding():
 		flip_enemy()
+	
+	# Handle continuous damage for anyone staying in the hitbox
+	deal_contact_damage()
+
+func deal_contact_damage():
+	var now := Time.get_ticks_msec() / 1000.0
+
+	for body in bodies_in_hitbox.duplicate():
+		# Clean up invalid or dead targets
+		if not is_instance_valid(body):
+			bodies_in_hitbox.erase(body)
+			damage_cooldowns.erase(body)
+			continue
+
+		if not body.get("alive"):
+			continue
+
+		# Check if the cooldown interval has passed
+		var next_time = damage_cooldowns.get(body, 0.0)
+		if now < next_time:
+			continue
+
+		# Apply damage
+		if body.has_method("take_damage"):
+			body.take_damage()
+			player_damaged.emit()
+			damage_cooldowns[body] = now + contact_damage_interval
 
 func flip_enemy() -> void:
 	direction *= -1
@@ -42,13 +90,21 @@ func shoot() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if (body.name == "Buzz" or body.name == "Woody") and body.get("alive"):
+		# Stomp mechanic: Player damages enemy if falling on them
 		if body.velocity.y > 10: 
 			body.velocity.y = -500 
 			take_damage(1)
 		else:
-			if body.has_method("take_damage"):
-				body.take_damage()
-				player_damaged.emit()
+			# If touching from the side/bottom, track for continuous damage
+			if not bodies_in_hitbox.has(body):
+				bodies_in_hitbox.append(body)
+				# Apply initial damage immediately
+				damage_cooldowns[body] = 0.0
+
+func _on_body_exited(body: Node2D) -> void:
+	# Stop tracking damage when the player leaves contact
+	bodies_in_hitbox.erase(body)
+	damage_cooldowns.erase(body)
 
 func take_damage(amount: int) -> void:
 	health -= amount

@@ -157,7 +157,7 @@ autostart = true
 [node name="Muzzle" type="Marker2D" parent="."]
 position = Vector2(-51, 0)
 
-[node name="RayCast2D" type="RayCast2D" parent="."]
+[node name="WallDetector" type="RayCast2D" parent="."]
 position = Vector2(-40, 1)
 target_position = Vector2(-20, 0)
 

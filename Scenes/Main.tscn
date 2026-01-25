@@ -1,7 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=6 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
+[ext_resource type="FontFile" uid="uid://c0l2vmig8sgyx" path="res://Assets/Fonts/Peace Sans Webfont.ttf" id="3_rgh2o"]
+
+[sub_resource type="Theme" id="Theme_idj7w"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kln2b"]
 
 [node name="Main" type="Node2D"]
 position = Vector2(8, 434)
@@ -9,3 +14,75 @@ script = ExtResource("1_kln2b")
 
 [node name="LevelPlaceholder" parent="." instance=ExtResource("3_kln2b")]
 position = Vector2(853, -680)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="PauseMenu" type="Panel" parent="HUD"]
+process_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -206.25
+offset_top = -190.0
+offset_right = 206.25
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -106.0
+offset_top = -147.0
+offset_right = -3.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+theme_override_constants/separation = 7
+
+[node name="Resume" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_rgh2o")
+text = "Resume
+"
+
+[node name="Restart" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_rgh2o")
+text = "Restart"
+
+[node name="Main Menu" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_rgh2o")
+text = "Main Menu"
+
+[node name="Quit" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_rgh2o")
+text = "Quit"
+
+[node name="Pause" type="Button" parent="HUD"]
+process_mode = 3
+offset_left = 1055.0
+offset_top = 4.0
+offset_right = 1145.0
+offset_bottom = 46.0
+theme = SubResource("Theme_idj7w")
+theme_override_colors/font_color = Color(0.9822288, 0.8319908, 0.8448679, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_kln2b")
+text = "Pause"
+
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Main Menu" to="." method="_on_main_menu_pressed"]
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="HUD/Pause" to="." method="_on_pause_pressed"]
