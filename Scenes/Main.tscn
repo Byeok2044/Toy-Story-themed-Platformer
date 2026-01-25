@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=12 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
@@ -23,6 +23,13 @@ shadow_size = 4
 [sub_resource type="Theme" id="Theme_idj7w"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kln2b"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50glp"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vy5pj"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
 
 [node name="Main" type="Node2D"]
 position = Vector2(8, 434)
@@ -112,12 +119,14 @@ offset_top = 4.0
 offset_right = 1145.0
 offset_bottom = 54.0
 theme = SubResource("Theme_idj7w")
-theme_override_colors/font_color = Color(0.9822288, 0.8319908, 0.8448679, 1)
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
 theme_override_colors/font_pressed_color = Color(0.78039217, 0.67058825, 0.023529412, 1)
 theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.023529412, 1)
 theme_override_fonts/font = ExtResource("3_rgh2o")
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_kln2b")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_50glp")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vy5pj")
 text = "II"
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]

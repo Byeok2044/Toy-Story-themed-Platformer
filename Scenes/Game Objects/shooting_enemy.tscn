@@ -165,4 +165,5 @@ target_position = Vector2(-20, 0)
 position = Vector2(-38, -10)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
 [connection signal="timeout" from="Shot Timer" to="." method="_on_shot_timer_timeout"]

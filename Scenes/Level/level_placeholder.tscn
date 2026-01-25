@@ -725,6 +725,18 @@ position = Vector2(1832, 77)
 [node name="FlyingEnemy3" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
 position = Vector2(3585, -1035)
 
+[node name="FlyingEnemy9" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
+position = Vector2(2244, -548)
+
+[node name="FlyingEnemy12" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
+position = Vector2(2627, -644)
+
+[node name="FlyingEnemy10" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
+position = Vector2(2404, -242)
+
+[node name="FlyingEnemy11" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
+position = Vector2(2663, -49)
+
 [node name="FlyingEnemy6" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
 position = Vector2(5299, -1098)
 

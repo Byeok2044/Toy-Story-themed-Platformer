@@ -183,7 +183,7 @@ func take_damage():
 	health -= 1
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("apply_shake"):
-		cam.apply_shake(10.0)
+		cam.apply_shake(0.5) 
 	if hearts_list.size() > 0:
 		var heart = hearts_list.pop_back()
 		heart.queue_free()
