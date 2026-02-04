@@ -1,8 +1,8 @@
 extends Area2D
 
 @export var speed: float = 400.0
-@export var steer_force: float = 500.0     
-@export var lifetime: float = 3.0 # The laser will disappear after this many seconds
+@export var steer_force: float = 500.0      
+@export var lifetime: float = 3.0
 @export var lead_strength: float = 0.6    
 
 var velocity: Vector2
@@ -13,8 +13,6 @@ func start(spawn_transform: Transform2D, new_target: Node2D = null) -> void:
 	velocity = transform.x.normalized() * speed
 	target = new_target
 	
-	# --- Lifetime Logic ---
-	# Automatically destroys the laser after the specified lifetime duration
 	get_tree().create_timer(lifetime).timeout.connect(queue_free)
 
 func _physics_process(delta: float) -> void:
@@ -43,17 +41,17 @@ func get_desired_velocity() -> Vector2:
 func move_straight(delta: float) -> void:
 	rotation = velocity.angle()
 	position += velocity * delta
-
-# --- Collision Logic ---
-
-func _on_body_entered(body: Node) -> void:
-	# 1. Check if the hit object is the player target
-	if body == target:
-		if body.has_method("take_damage"):
-			body.take_damage() # Calls the player's take_damage method
-		queue_free()
 	
+func _on_body_entered(body: Node) -> void:
+	# 1. Check if the object hit is in the "player" group
+	# This covers both the current 'target' and any other player characters
+	if body.is_in_group("players"):
+		if body.has_method("take_damage"):
+			body.take_damage()
+		queue_free()
+		return
+
 	# 2. Tilemap/Wall Collision Logic
-	# This checks if the body is a TileMap or belongs to the "walls" group
-	elif body is TileMap or body.is_in_group("walls") or body is StaticBody2D:
+	# This ensures the projectile disappears when hitting the environment
+	if body is TileMap or body is TileMapLayer or body.is_in_group("walls") or body is StaticBody2D:
 		queue_free()

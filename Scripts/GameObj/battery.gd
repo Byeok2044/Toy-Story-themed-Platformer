@@ -7,6 +7,8 @@ signal destroyed
 @onready var health_bar: ProgressBar = $HealthBar
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+# FIXED: Renamed to match the usage in your functions
+@onready var sprite_damaged: Sprite2D = $Sprite2D2
 
 var current_health: int
 var _active: bool = false
@@ -28,7 +30,12 @@ func trigger_sequence() -> void:
 	
 	# Show and Enable
 	visible = true
-	sprite.modulate = Color(1, 1, 1, 1)
+	sprite.visible = true # Ensure normal sprite is shown
+	if sprite_damaged: 
+		sprite_damaged.visible = false # Hide damaged sprite
+		sprite_damaged.modulate = Color.WHITE # Reset its color
+	
+	sprite.modulate = Color.WHITE
 	collision_shape.set_deferred("disabled", false)
 	
 	if health_bar:
@@ -42,10 +49,16 @@ func take_damage(amount: int) -> void:
 	current_health -= amount
 	if health_bar: health_bar.value = current_health
 	
-	# Flash Effect
+	# Switch to Sprite2D2 if health is less than half
+	if sprite_damaged and current_health <= (max_health / 2.0):
+		sprite.visible = false
+		sprite_damaged.visible = true
+	
+	# Flash Effect (Targets whichever sprite is currently visible)
+	var active_sprite = sprite_damaged if (sprite_damaged and sprite_damaged.visible) else sprite
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.RED, 0.1)
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	tween.tween_property(active_sprite, "modulate", Color.RED, 0.1)
+	tween.tween_property(active_sprite, "modulate", Color.WHITE, 0.1)
 	
 	if current_health <= 0:
 		die()

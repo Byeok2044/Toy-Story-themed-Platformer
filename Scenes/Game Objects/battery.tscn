@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://qjo77fxtyy2p"]
+[gd_scene load_steps=7 format=3 uid="uid://qjo77fxtyy2p"]
 
 [ext_resource type="Script" uid="uid://bep41bpxhfbdm" path="res://Scripts/GameObj/battery.gd" id="1_ymdsi"]
 [ext_resource type="Texture2D" uid="uid://b34sn68afk6vf" path="res://Assets/Images/Icons/batt.png" id="2_vpqti"]
+[ext_resource type="Texture2D" uid="uid://bpq8un5pl63ab" path="res://Assets/Images/Icons/batt50.png" id="3_vpqti"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cmlqs"]
 size = Vector2(57, 86)
@@ -38,3 +39,8 @@ theme_override_styles/background = SubResource("StyleBoxFlat_kc0qv")
 theme_override_styles/fill = SubResource("StyleBoxFlat_it2pt")
 value = 100.0
 show_percentage = false
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(-1.2500082, 4.812494)
+scale = Vector2(0.34749997, 0.33729166)
+texture = ExtResource("3_vpqti")
