@@ -437,7 +437,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wiopy"]
-size = Vector2(51.333336, 57.666668)
+size = Vector2(51.333336, 26.666668)
 
 [sub_resource type="Theme" id="Theme_rhljv"]
 
@@ -494,7 +494,7 @@ tile_set = SubResource("TileSet_ytae3")
 
 [node name="Woody" type="CharacterBody2D" parent="." groups=["players"]]
 process_mode = 1
-position = Vector2(-214, 532)
+position = Vector2(7412.0005, -1589)
 scale = Vector2(3, 3)
 collision_layer = 3
 script = ExtResource("3_kxxt8")
@@ -579,7 +579,7 @@ collision_layer = 3
 collision_mask = 5
 
 [node name="Hitbox" type="CollisionShape2D" parent="Woody/MeleeArea"]
-position = Vector2(1, 1.833313)
+position = Vector2(1, 3.333374)
 shape = SubResource("RectangleShape2D_wiopy")
 
 [node name="MeleeTimer" type="Timer" parent="Woody"]
@@ -587,7 +587,7 @@ wait_time = 0.3
 
 [node name="Buzz" type="CharacterBody2D" parent="." groups=["players"]]
 process_mode = 1
-position = Vector2(-166, 484)
+position = Vector2(7339, -1589.0001)
 scale = Vector2(3, 3)
 collision_layer = 3
 script = ExtResource("3_y7iwr")
@@ -708,7 +708,7 @@ position = Vector2(5085, -994)
 position = Vector2(4324, -1184)
 
 [node name="ShootingEnemy5" parent="Enemies" groups=["enemies"] instance=ExtResource("9_wiopy")]
-position = Vector2(6649, -1283)
+position = Vector2(6649, -1279)
 
 [node name="FlyingEnemy" parent="Enemies" groups=["enemies"] instance=ExtResource("10_e6cjp")]
 position = Vector2(1535, 125)

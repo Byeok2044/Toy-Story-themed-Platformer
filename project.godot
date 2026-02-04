@@ -23,6 +23,11 @@ Global="*res://Scripts/Menu/global.gd"
 
 window/stretch/mode="canvas_items"
 
+[global_group]
+
+enemies=""
+players=""
+
 [input]
 
 p1_left={

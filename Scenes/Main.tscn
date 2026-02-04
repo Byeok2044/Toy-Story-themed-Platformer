@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=13 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
 [ext_resource type="FontFile" uid="uid://c0l2vmig8sgyx" path="res://Assets/Fonts/Peace Sans Webfont.ttf" id="3_rgh2o"]
+[ext_resource type="PackedScene" uid="uid://bmf0lff323flc" path="res://Scenes/Level/bossfight.tscn" id="4_rgh2o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
@@ -128,6 +129,10 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_kln2b")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_50glp")
 theme_override_styles/hover = SubResource("StyleBoxFlat_vy5pj")
 text = "II"
+
+[node name="Bossfight" parent="." instance=ExtResource("4_rgh2o")]
+position = Vector2(8295, -3995.0002)
+scale = Vector2(3, 3)
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Restart" to="." method="_on_restart_pressed"]

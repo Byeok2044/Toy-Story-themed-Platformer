@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://qjo77fxtyy2p"]
+
+[ext_resource type="Script" uid="uid://bep41bpxhfbdm" path="res://Scripts/GameObj/battery.gd" id="1_ymdsi"]
+[ext_resource type="Texture2D" uid="uid://b34sn68afk6vf" path="res://Assets/Images/Icons/batt.png" id="2_vpqti"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cmlqs"]
+size = Vector2(57, 86)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kc0qv"]
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it2pt"]
+bg_color = Color(0.29411766, 0, 0.50980395, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Battery" type="Area2D"]
+script = ExtResource("1_ymdsi")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_vpqti")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(2.5, 7)
+shape = SubResource("RectangleShape2D_cmlqs")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -26.0
+offset_top = -42.0
+offset_right = 31.0
+offset_bottom = -37.0
+theme_override_styles/background = SubResource("StyleBoxFlat_kc0qv")
+theme_override_styles/fill = SubResource("StyleBoxFlat_it2pt")
+value = 100.0
+show_percentage = false

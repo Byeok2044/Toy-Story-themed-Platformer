@@ -1,15 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://mim3pp6fhalf"]
+[gd_scene load_steps=3 format=3 uid="uid://b4v6643jnb6cn"]
 
-[ext_resource type="Texture2D" uid="uid://dmb1wb58mi7jh" path="res://Assets/Images/Platforms/Obstacles/spikes.png" id="1_iia67"]
-[ext_resource type="Script" uid="uid://bskrrju7eb5jr" path="res://Scenes/Game Objects/spikes.gd" id="1_kxv4n"]
+[ext_resource type="Script" uid="uid://46ncvykwuvr3" path="res://Scripts/GameObj/bossspikes.gd" id="1_bijks"]
+[ext_resource type="Texture2D" uid="uid://dmb1wb58mi7jh" path="res://Assets/Images/Platforms/Obstacles/spikes.png" id="2_dij87"]
 
-[node name="Spikes" type="Area2D"]
+[node name="bossspikes" type="Area2D"]
 collision_mask = 6
-script = ExtResource("1_kxv4n")
+script = ExtResource("1_bijks")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(3, 3)
-texture = ExtResource("1_iia67")
+texture = ExtResource("2_dij87")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 scale = Vector2(3, 3)

@@ -1,32 +1,24 @@
-[gd_scene load_steps=5 format=3 uid="uid://bvegk2prne0aq"]
+[gd_scene load_steps=4 format=3 uid="uid://bvegk2prne0aq"]
 
 [ext_resource type="Script" uid="uid://bbyug2jbr8p5d" path="res://Scripts/GameObj/boss.gd" id="1_7mjsi"]
-[ext_resource type="PackedScene" uid="uid://drxbw6gcjp6fu" path="res://Scenes/Game Objects/homing_lazer.tscn" id="2_r8w52"]
 [ext_resource type="Texture2D" uid="uid://cdcvqudlym3uk" path="res://Assets/Images/Enemies/Screenshot 2026-01-27 144831.png" id="2_rpt0j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r8w52"]
-size = Vector2(236, 88)
+size = Vector2(106, 90)
 
 [node name="Boss" type="Area2D" groups=["enemies"]]
-process_mode = 1
 script = ExtResource("1_7mjsi")
-homing_laser_scene = ExtResource("2_r8w52")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(3.8146973e-06, 0)
-scale = Vector2(0.6941177, 0.260355)
+scale = Vector2(0.32058835, 0.260355)
 texture = ExtResource("2_rpt0j")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_r8w52")
 
-[node name="MuzzleLeft" type="Marker2D" parent="."]
-position = Vector2(-78, 19)
-
-[node name="MuzzleRight" type="Marker2D" parent="."]
-position = Vector2(78, 19)
+[node name="Muzzle" type="Marker2D" parent="."]
+position = Vector2(-47, 11)
 
 [node name="ShootTimer" type="Timer" parent="."]
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="ShootTimer" to="." method="_on_shoot_timer_timeout"]

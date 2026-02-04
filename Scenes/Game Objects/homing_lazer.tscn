@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://drxbw6gcjp6fu"]
+
+[ext_resource type="Script" uid="uid://gv5l14ncs2gn" path="res://Scripts/GameObj/homing_lazer.gd" id="1_xny7l"]
+[ext_resource type="Texture2D" uid="uid://8qo8wicu83q4" path="res://Assets/Images/Icons/laser.png" id="2_70x0g"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tru2n"]
+size = Vector2(49, 15)
+
+[node name="homing_lazer" type="Area2D"]
+process_mode = 1
+script = ExtResource("1_xny7l")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(20, 14.999999)
+scale = Vector2(0.27627626, 0.358)
+texture = ExtResource("2_70x0g")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1.5, 0)
+shape = SubResource("RectangleShape2D_tru2n")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(-13, 0)
+rect = Rect2(-10, -10, 50, 19)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
