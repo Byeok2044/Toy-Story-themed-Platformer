@@ -4,19 +4,18 @@ signal destroyed
 
 @export_group("Movement")
 const SPEED = 140.0 
-const ACCEL = 5.0      # Lower = weightier, Higher = snappier
-const FRICTION = 4.0   # How fast it slows down
+const ACCEL = 5.0      
+const FRICTION = 4.0   
 const RETURN_SPEED = 100.0
-const STEERING_FORCE = 0.1 # How sharply it can turn while chasing
+const STEERING_FORCE = 0.1 
 
 @export_group("Combat")
-@export var health: int = 10
-@export var max_health: int = 10
+@export var health: int = 5
+@export var max_health: int = 5
 @export var contact_damage_interval := 2.0
 
 @export_group("Detection")
 @export var max_distance: float = 600.0 
-@export var detection_radius: float = 350.0 
 @export var flip_cooldown: float = 0.25 
 
 var damage_cooldowns := {} 
@@ -31,16 +30,27 @@ var _active: bool = false
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var timer: Timer = $Timer
+# Reference to your existing Area2D node
+@onready var detection_area: Area2D = $DetectionArea
 
 func _ready():
 	home_position = global_position
 	add_to_group("enemies") 
+	
+	# Connect detection signals dynamically if not done in editor
+	if not detection_area.body_entered.is_connected(_on_detection_area_body_entered):
+		detection_area.body_entered.connect(_on_detection_area_body_entered)
+	if not detection_area.body_exited.is_connected(_on_detection_area_body_exited):
+		detection_area.body_exited.connect(_on_detection_area_body_exited)
+		
 	_reset_to_hidden()
 
 func _reset_to_hidden() -> void:
 	_active = false
 	alive = false
 	visible = false
+	is_bat_chase = false
+	target = null
 	set_physics_process(false)
 	set_process(false)
 	if has_node("CollisionShape2D"):
@@ -62,49 +72,7 @@ func trigger_sequence() -> void:
 
 func _process(_delta):
 	if not alive or not _active: return 
-	update_target_logic()
 	handle_animation()
-
-func update_target_logic():
-	var dist_from_home = global_position.distance_to(home_position)
-	
-	# If too far from home, force a return
-	if dist_from_home > max_distance:
-		is_bat_chase = false
-		target = null
-		return
-
-	var nearest = find_nearest_player()
-	
-	if nearest is CharacterBody2D:
-		var dist = global_position.distance_to(nearest.global_position)
-		
-		# HYSTERESIS: Use a larger radius to stop chasing than to start it
-		# This prevents "flickering" logic at the edge of the circle
-		var effective_radius = detection_radius * (1.2 if is_bat_chase else 1.0)
-		
-		if dist <= effective_radius:
-			is_bat_chase = true
-			target = nearest
-		else:
-			is_bat_chase = false
-			target = null
-	else:
-		is_bat_chase = false
-		target = null
-
-func find_nearest_player() -> CharacterBody2D:
-	var players = get_tree().get_nodes_in_group("players")
-	var nearest_player: CharacterBody2D = null
-	var min_dist = INF
-	
-	for p in players:
-		if p is CharacterBody2D and p.get("alive") != false:
-			var dist = global_position.distance_to(p.global_position)
-			if dist < min_dist:
-				min_dist = dist
-				nearest_player = p
-	return nearest_player
 
 func _physics_process(delta):
 	if not alive or not _active: return 
@@ -113,22 +81,23 @@ func _physics_process(delta):
 	var desired_velocity = Vector2.ZERO
 	var dist_from_home = global_position.distance_to(home_position)
 	
+	# Force a return if too far from home, even if target is in area
+	if dist_from_home > max_distance:
+		is_bat_chase = false
+		target = null
+
 	if target and is_bat_chase:
-		# SMOOTH CHASE: Predict target position slightly and steer toward it
 		var p_vel = target.velocity if "velocity" in target else Vector2.ZERO
 		var target_pos = target.global_position + (p_vel * 0.1)
 		var target_dir = global_position.direction_to(target_pos)
 		
-		# Blend current velocity direction with target direction for a "curve" effect
 		desired_velocity = target_dir * SPEED
 		velocity = velocity.lerp(desired_velocity, STEERING_FORCE) 
 		
 	elif dist_from_home > 30.0:
-		# SMOOTH RETURN
 		desired_velocity = global_position.direction_to(home_position) * RETURN_SPEED
 		velocity = velocity.lerp(desired_velocity, ACCEL * delta)
 	else:
-		# IDLE WANDER / FRICTION
 		if dir != Vector2.ZERO:
 			desired_velocity = dir * (SPEED * 0.4)
 			velocity = velocity.lerp(desired_velocity, ACCEL * delta)
@@ -137,14 +106,37 @@ func _physics_process(delta):
 		
 	move_and_slide()
 
-# ... (rest of your functions: deal_contact_damage, handle_animation, take_damage, die, etc.)
+func _on_detection_area_body_entered(body: Node2D) -> void:
+	if body.is_in_group("players") and body.get("alive") != false:
+		target = body as CharacterBody2D
+		is_bat_chase = true
+
+func _on_detection_area_body_exited(body: Node2D) -> void:
+	if body == target:
+		target = null
+		is_bat_chase = false
+
+# --- EXISTING COMBAT/ANIMATION LOGIC ---
+func deal_contact_damage():
+	var now := Time.get_ticks_msec() / 1000.0
+	for body in bodies_in_hitbox.duplicate():
+		if not is_instance_valid(body) or body.get("alive") == false:
+			bodies_in_hitbox.erase(body)
+			continue
+
+		var next_time = damage_cooldowns.get(body, 0.0)
+		if now < next_time: continue
+
+		if body.has_method("take_damage"):
+			body.take_damage()
+			damage_cooldowns[body] = now + contact_damage_interval
+			velocity = global_position.direction_to(body.global_position) * -250
 
 func handle_animation():
 	if not alive: return
 	if animated_sprite_2d.sprite_frames.has_animation("fly"):
 		animated_sprite_2d.play("fly")
 	
-	# Only flip if moving horizontally with enough intent
 	if abs(velocity.x) > 10.0:
 		var current_time = Time.get_ticks_msec() / 1000.0
 		var wants_to_flip = (velocity.x < 0) != animated_sprite_2d.flip_h
@@ -183,19 +175,3 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 
 func _on_hitbox_body_exited(body: Node2D) -> void:
 	bodies_in_hitbox.erase(body)
-
-func deal_contact_damage():
-	var now := Time.get_ticks_msec() / 1000.0
-	for body in bodies_in_hitbox.duplicate():
-		if not is_instance_valid(body) or body.get("alive") == false:
-			bodies_in_hitbox.erase(body)
-			continue
-
-		var next_time = damage_cooldowns.get(body, 0.0)
-		if now < next_time: continue
-
-		if body.has_method("take_damage"):
-			body.take_damage()
-			damage_cooldowns[body] = now + contact_damage_interval
-			# Knockback
-			velocity = global_position.direction_to(body.global_position) * -250

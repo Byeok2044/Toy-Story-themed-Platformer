@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://bbyug2jbr8p5d" path="res://Scripts/GameObj/boss.gd" id="1_7mjsi"]
 [ext_resource type="PackedScene" uid="uid://drxbw6gcjp6fu" path="res://Scenes/Game Objects/homing_lazer.tscn" id="2_r8w52"]
-[ext_resource type="Texture2D" uid="uid://cdcvqudlym3uk" path="res://Assets/Images/Enemies/Screenshot 2026-01-27 144831.png" id="2_rpt0j"]
+[ext_resource type="Texture2D" uid="uid://cma7nnlnf8hag" path="res://Assets/Images/Enemies/4cd97eb0-781f-4472-9583-e7fc7e6c2f28-removebg-preview.png" id="3_r8w52"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r8w52"]
-size = Vector2(236, 88)
+size = Vector2(137, 84)
 
 [node name="Boss" type="Area2D" groups=["enemies"]]
 process_mode = 1
@@ -14,17 +14,18 @@ homing_laser_scene = ExtResource("2_r8w52")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(3.8146973e-06, 0)
-scale = Vector2(0.6941177, 0.260355)
-texture = ExtResource("2_rpt0j")
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("3_r8w52")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, -22)
 shape = SubResource("RectangleShape2D_r8w52")
 
 [node name="MuzzleLeft" type="Marker2D" parent="."]
-position = Vector2(-78, 19)
+position = Vector2(-34, -8)
 
 [node name="MuzzleRight" type="Marker2D" parent="."]
-position = Vector2(78, 19)
+position = Vector2(37, -8)
 
 [node name="ShootTimer" type="Timer" parent="."]
 

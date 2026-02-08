@@ -109,9 +109,6 @@ func start_attack_cycle() -> void:
 		flash_color(Color.WHITE)
 		await get_tree().create_timer(cycle_restart_delay).timeout
 
-# =====================================================
-# WEAKNESS SET HANDLING (LIKE SPIKE LOGIC)
-# =====================================================
 func trigger_weakness_set(suffix: String) -> void:
 	var batt_group = get_tree().get_nodes_in_group("BattArr" + suffix)
 	var enemy_group = get_tree().get_nodes_in_group("EnemyArr" + suffix)

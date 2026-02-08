@@ -186,8 +186,8 @@ texture = ExtResource("11_grg3l")
 
 [node name="Background8" type="Sprite2D" parent="."]
 z_index = -9
-position = Vector2(8244.5, -1990.7277)
-scale = Vector2(6.624987, 10.4717655)
+position = Vector2(8239.5, -1999.4999)
+scale = Vector2(6.8035684, 10.945943)
 texture = ExtResource("11_grg3l")
 
 [node name="Background9" type="Sprite2D" parent="."]
@@ -198,8 +198,8 @@ texture = ExtResource("12_frkhe")
 
 [node name="Background10" type="Sprite2D" parent="."]
 z_index = -9
-position = Vector2(9572.001, -1626.1356)
-scale = Vector2(29.434097, 7.09315)
+position = Vector2(9572.001, -1963.6356)
+scale = Vector2(29.434097, 1.5146387)
 texture = ExtResource("12_frkhe")
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]

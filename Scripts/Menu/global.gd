@@ -56,8 +56,14 @@ func _on_resume_pressed() -> void:
 	toggle_pause()
 
 func _on_restart_pressed() -> void:
-
+	if Global.respawn_point != null:
+		Global.respawn_point = null
+		print("Global checkpoint cleared for hard restart.")
+	
+	# 2. Unpause the game
 	get_tree().paused = false
+	
+	# 3. Reload the scene
 	get_tree().reload_current_scene()
 
 func _on_main_menu_pressed() -> void:
