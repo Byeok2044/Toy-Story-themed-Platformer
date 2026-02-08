@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://bgt1p83ungkem"]
+[gd_scene load_steps=41 format=3 uid="uid://bgt1p83ungkem"]
 
 [ext_resource type="Script" uid="uid://c3flqknq3ot0e" path="res://Scripts/GameObj/Woody.gd" id="1_i3vcm"]
 [ext_resource type="Texture2D" uid="uid://cje6c8l2jsskx" path="res://Assets/Images/Player/Hit (32x32).png" id="2_1txkv"]
@@ -6,8 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://coasqnt5gngda" path="res://Assets/Images/Player/Jump (32x32).png" id="4_d8pv4"]
 [ext_resource type="Texture2D" uid="uid://84baqbepqw0k" path="res://Assets/Images/Player/Run (32x32).png" id="5_uqse8"]
 [ext_resource type="Texture2D" uid="uid://c4si5s2es7gry" path="res://Assets/Images/Icons/heart.png" id="6_o737o"]
-[ext_resource type="AudioStream" uid="uid://6w72b241j76p" path="res://Sounds/jump.wav" id="7_i3vcm"]
-[ext_resource type="AudioStream" uid="uid://c7n2t8nnqt0e1" path="res://Sounds/death.wav" id="8_d8pv4"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bhhdu"]
 atlas = ExtResource("2_1txkv")
@@ -328,7 +326,5 @@ scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_bhhdu")
 
 [node name="Jump sound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("7_i3vcm")
 
 [node name="death sound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("8_d8pv4")

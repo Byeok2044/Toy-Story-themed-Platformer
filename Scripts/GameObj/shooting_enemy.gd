@@ -17,6 +17,10 @@ var bodies_in_hitbox: Array[Node2D] = []
 @onready var wall_detector: RayCast2D = $WallDetector
 @onready var ledge_detector: RayCast2D = $LedgeDetector 
 
+# --- NEW AUDIO REFERENCE ---
+@onready var shoot_sound: AudioStreamPlayer2D = $ShootSound
+
+
 signal player_damaged
 
 var direction: float = -1.0
@@ -40,7 +44,6 @@ func deal_contact_damage():
 	var now := Time.get_ticks_msec() / 1000.0
 
 	for body in bodies_in_hitbox.duplicate():
-		# Clean up invalid or dead targets
 		if not is_instance_valid(body):
 			bodies_in_hitbox.erase(body)
 			damage_cooldowns.erase(body)
@@ -49,12 +52,10 @@ func deal_contact_damage():
 		if not body.get("alive"):
 			continue
 
-		# Check if the cooldown interval has passed
 		var next_time = damage_cooldowns.get(body, 0.0)
 		if now < next_time:
 			continue
 
-		# Apply damage
 		if body.has_method("take_damage"):
 			body.take_damage()
 			player_damaged.emit()
@@ -74,6 +75,20 @@ func _on_shot_timer_timeout() -> void:
 
 func shoot() -> void:
 	if laser_scene:
+		# --- TRIGGER SHOOT ANIMATION ---
+		if animated_sprite_2d.sprite_frames.has_animation("shoot"):
+			animated_sprite_2d.play("shoot")
+			# Return to default after the shot is done
+			get_tree().create_timer(0.4).timeout.connect(func(): 
+				if animated_sprite_2d.animation == "shoot":
+					animated_sprite_2d.play("default")
+			)
+		
+		# Play the spatialized shoot sound
+		if shoot_sound:
+			shoot_sound.pitch_scale = randf_range(0.9, 1.1)
+			shoot_sound.play()
+			
 		var laser = laser_scene.instantiate()
 		get_parent().add_child(laser)
 		laser.global_position = muzzle.global_position
@@ -83,19 +98,15 @@ func shoot() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if (body.name == "Buzz" or body.name == "Woody") and body.get("alive"):
-		# Stomp mechanic: Player damages enemy if falling on them
 		if body.velocity.y > 10: 
 			body.velocity.y = -500 
 			take_damage(1)
 		else:
-			# If touching from the side/bottom, track for continuous damage
 			if not bodies_in_hitbox.has(body):
 				bodies_in_hitbox.append(body)
-				# Apply initial damage immediately
 				damage_cooldowns[body] = 0.0
 
 func _on_body_exited(body: Node2D) -> void:
-	# Stop tracking damage when the player leaves contact
 	bodies_in_hitbox.erase(body)
 	damage_cooldowns.erase(body)
 
@@ -109,6 +120,7 @@ func take_damage(amount: int) -> void:
 	if health <= 0:
 		die()
 	else:
+		# Hit feedback while still alive
 		if animated_sprite_2d.sprite_frames.has_animation("hit"):
 			animated_sprite_2d.play("hit")
 			await get_tree().create_timer(0.2).timeout
@@ -117,9 +129,5 @@ func take_damage(amount: int) -> void:
 func die() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
-	
-	if animated_sprite_2d.sprite_frames.has_animation("hit"):
-		animated_sprite_2d.play("hit")
-		await animated_sprite_2d.animation_finished
 	
 	queue_free()

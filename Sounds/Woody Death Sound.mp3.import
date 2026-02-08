@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://db6rvyrifq66q"
+path="res://.godot/imported/Woody Death Sound.mp3-46a448ab081014d01b3dbb6619162123.mp3str"
+
+[deps]
+
+source_file="res://Sounds/Woody Death Sound.mp3"
+dest_files=["res://.godot/imported/Woody Death Sound.mp3-46a448ab081014d01b3dbb6619162123.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

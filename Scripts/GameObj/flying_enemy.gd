@@ -8,12 +8,13 @@ const RETURN_SPEED = 100.0
 @export var max_distance: float = 600.0 
 @export var detection_radius: float = 350.0 
 @export var flip_cooldown: float = 0.25 
-@export var contact_damage_interval := 0.6
+
+# --- UPDATED COOLDOWN HERE (2.0 Seconds) ---
+@export var contact_damage_interval := 2.0
 
 var damage_cooldowns := {} 
 var dir: Vector2
 var is_bat_chase: bool = false
-# target is strictly typed to CharacterBody2D to match Woody and Buzz scripts
 var target: CharacterBody2D = null 
 var alive: bool = true
 var home_position: Vector2
@@ -25,7 +26,7 @@ var bodies_in_hitbox: Array[Node2D] = []
 
 func _ready():
 	home_position = global_position
-	add_to_group("enemies") # Matches groups used in boss.gd
+	add_to_group("enemies") 
 	timer.start()
 
 func _process(_delta):
@@ -43,10 +44,8 @@ func update_target_logic():
 
 	var nearest = find_nearest_player()
 	
-	# Fix: Explicitly check if 'nearest' is a CharacterBody2D before assigning
 	if nearest is CharacterBody2D:
 		var diff = nearest.global_position - global_position
-		# Weighted distance to make detection of players below more responsive
 		var weighted_dist = Vector2(diff.x, diff.y * 0.7).length()
 		
 		if weighted_dist <= detection_radius:
@@ -64,7 +63,6 @@ func find_nearest_player() -> CharacterBody2D:
 	var min_dist = INF
 	
 	for p in players:
-		# Ensure we only consider valid CharacterBody2D nodes that are alive
 		if p is CharacterBody2D and p.get("alive") != false:
 			var dist = global_position.distance_to(p.global_position)
 			if dist < min_dist:
@@ -81,7 +79,6 @@ func _physics_process(delta):
 	var dist_from_home = global_position.distance_to(home_position)
 	
 	if target and is_bat_chase:
-		# Use velocity from Woody.gd or Buzz.gd for lead prediction
 		var p_vel = target.velocity if "velocity" in target else Vector2.ZERO
 		var target_pos = target.global_position + (p_vel * 0.1)
 		target_velocity = global_position.direction_to(target_pos) * speed
@@ -90,7 +87,6 @@ func _physics_process(delta):
 	else:
 		target_velocity = dir * (speed * 0.5)
 		
-	# Smooth interpolation to prevent jittering during flight
 	velocity = velocity.lerp(target_velocity, ACCEL * delta)
 	move_and_slide()
 
@@ -104,10 +100,11 @@ func deal_contact_damage():
 		var next_time = damage_cooldowns.get(body, 0.0)
 		if now < next_time: continue
 
-		# Calls take_damage() defined in Woody.gd and Buzz.gd
 		if body.has_method("take_damage"):
 			body.take_damage()
+			# Update the cooldown map with the current time + 2 seconds
 			damage_cooldowns[body] = now + contact_damage_interval
+			# Knockback effect
 			velocity = global_position.direction_to(body.global_position) * -200
 
 func handle_animation():
@@ -127,10 +124,9 @@ func take_damage(amount: int = 1):
 	if not alive: return
 	health -= amount
 	
-	# Visual feedback matching boss and player hurt effects
 	var flash_tween = create_tween()
-	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.RED, 0.1)
-	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.WHITE, 0.1)
+	flash_tween.tween_property(animated_sprite_2d, "modulate", Color(10, 10, 10, 1), 0.08)
+	flash_tween.tween_property(animated_sprite_2d, "modulate", Color.WHITE, 0.08)
 	
 	if health <= 0:
 		die()
@@ -139,7 +135,7 @@ func die():
 	if not alive: return
 	alive = false
 	velocity = Vector2.ZERO
-	set_collision_layer_value(1, false) # Disable collisions so player can pass through
+	set_collision_layer_value(1, false) 
 	
 	if animated_sprite_2d.sprite_frames.has_animation("die"):
 		animated_sprite_2d.play("die")
@@ -155,7 +151,9 @@ func _on_timer_timeout() -> void:
 func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("players") and not bodies_in_hitbox.has(body):
 		bodies_in_hitbox.append(body)
-		damage_cooldowns[body] = 0.0 
+		# Initialize with 0 so they can be hit immediately upon first contact
+		if not damage_cooldowns.has(body):
+			damage_cooldowns[body] = 0.0 
 
 func _on_hitbox_body_exited(body: Node2D) -> void:
 	bodies_in_hitbox.erase(body)

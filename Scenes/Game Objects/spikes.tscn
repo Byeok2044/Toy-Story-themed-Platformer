@@ -1,18 +1,22 @@
-[gd_scene load_steps=3 format=3 uid="uid://mim3pp6fhalf"]
+[gd_scene load_steps=4 format=3 uid="uid://mim3pp6fhalf"]
 
-[ext_resource type="Texture2D" uid="uid://dmb1wb58mi7jh" path="res://Assets/Images/Platforms/Obstacles/spikes.png" id="1_iia67"]
 [ext_resource type="Script" uid="uid://bskrrju7eb5jr" path="res://Scenes/Game Objects/spikes.gd" id="1_kxv4n"]
+[ext_resource type="Texture2D" uid="uid://bs7jcu11vukyr" path="res://Assets/Images/Platforms/Obstacles/Spike ground.png" id="2_kxv4n"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p2b0a"]
+size = Vector2(90, 34)
 
 [node name="Spikes" type="Area2D"]
 collision_mask = 6
 script = ExtResource("1_kxv4n")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(3, 3)
-texture = ExtResource("1_iia67")
+position = Vector2(21.999996, -61.500015)
+scale = Vector2(1.9374999, 3.515625)
+texture = ExtResource("2_kxv4n")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-scale = Vector2(3, 3)
-polygon = PackedVector2Array(-8, 7.666667, -8, 8, -8, 3.6666667, -7.3333335, 1.6666667, -6.3333335, -0.33333334, -5, -1.3333334, -4, -1.3333334, -3, -0.33333334, -2, 1.6666667, -1, 4, -0.6666667, 6, 0, 3.6666667, 0.6666667, 1.6666667, 1.6666667, -0.33333334, 2.6666667, -1.3333334, 4, -1.3333334, 5, 0, 6, 2, 7, 3.6666667, 8, 5.666667, 8, 8, -8, 8)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(24, -4)
+shape = SubResource("RectangleShape2D_p2b0a")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

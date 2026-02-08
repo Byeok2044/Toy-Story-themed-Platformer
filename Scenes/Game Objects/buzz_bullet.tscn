@@ -7,11 +7,12 @@
 size = Vector2(39, 15)
 
 [node name="buzz_laser" type="Area2D"]
-collision_layer = 8
-collision_mask = 5
+collision_layer = 13
+collision_mask = 13
 script = ExtResource("1_hwe0u")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(13.999999, 10.999999)
 scale = Vector2(0.21621622, 0.29466668)
 texture = ExtResource("2_7th37")
 
@@ -19,6 +20,7 @@ texture = ExtResource("2_7th37")
 shape = SubResource("RectangleShape2D_tru2n")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(-10, 0)
 rect = Rect2(-10, -8, 39, 16)
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]

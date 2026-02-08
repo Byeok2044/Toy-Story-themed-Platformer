@@ -21,6 +21,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="Battery" type="Area2D"]
+collision_layer = 8
 script = ExtResource("1_ymdsi")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

@@ -1,9 +1,17 @@
-[gd_scene load_steps=13 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=21 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
 [ext_resource type="FontFile" uid="uid://c0l2vmig8sgyx" path="res://Assets/Fonts/Peace Sans Webfont.ttf" id="3_rgh2o"]
 [ext_resource type="PackedScene" uid="uid://bmf0lff323flc" path="res://Scenes/Level/bossfight.tscn" id="4_rgh2o"]
+[ext_resource type="Texture2D" uid="uid://dcomn5imo8w1n" path="res://Assets/Images/Background/Background (1).png" id="5_pbw6q"]
+[ext_resource type="Texture2D" uid="uid://bkp11k2seb384" path="res://Assets/Images/Background/Screenshot 2026-02-08 190735.png" id="6_50glp"]
+[ext_resource type="Texture2D" uid="uid://bojl2r3f4tfm1" path="res://Assets/Images/Background/Screenshot 2026-02-08 190312.png" id="7_50glp"]
+[ext_resource type="Texture2D" uid="uid://08tchtueml8v" path="res://Assets/Images/Background/Screenshot 2026-02-08 190626.png" id="8_50glp"]
+[ext_resource type="Texture2D" uid="uid://u20xnmbofyxh" path="res://Assets/Images/Background/Screenshot 2026-02-08 195155.png" id="9_bmxlf"]
+[ext_resource type="Texture2D" uid="uid://nl1ps71xgj0f" path="res://Assets/Images/Background/Screenshot 2026-02-08 195435.png" id="10_4kpch"]
+[ext_resource type="Texture2D" uid="uid://d2ojt14j67fqr" path="res://Assets/Images/Background/Screenshot 2026-02-08 195708.png" id="11_grg3l"]
+[ext_resource type="Texture2D" uid="uid://b5080226jihrb" path="res://Assets/Images/Background/Screenshot 2026-02-08 195837.png" id="12_frkhe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
@@ -133,6 +141,66 @@ text = "II"
 [node name="Bossfight" parent="." instance=ExtResource("4_rgh2o")]
 position = Vector2(8295, -3995.0002)
 scale = Vector2(3, 3)
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(4687, -1153)
+scale = Vector2(5.1441655, 4.7527237)
+texture = ExtResource("5_pbw6q")
+
+[node name="Background2" type="Sprite2D" parent="."]
+z_index = -8
+position = Vector2(4344.9966, -1545.116)
+scale = Vector2(6.8098507, 10.593855)
+texture = ExtResource("6_50glp")
+
+[node name="Background3" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(3440.9998, -913)
+scale = Vector2(6.9849615, 7.60633)
+texture = ExtResource("7_50glp")
+
+[node name="Background4" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(2675.5923, -538.7512)
+scale = Vector2(9.216827, 9.088284)
+texture = ExtResource("8_50glp")
+
+[node name="Background5" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(6943.072, -2175.9678)
+scale = Vector2(6.7718716, 8.262916)
+texture = ExtResource("9_bmxlf")
+
+[node name="Background6" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(7840.1367, -2089)
+scale = Vector2(6.8513436, 7.941131)
+texture = ExtResource("10_4kpch")
+
+[node name="Background7" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(7492.041, -1899.2278)
+scale = Vector2(19.92713, 19.9042)
+texture = ExtResource("11_grg3l")
+
+[node name="Background8" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(8244.5, -1990.7277)
+scale = Vector2(6.624987, 10.4717655)
+texture = ExtResource("11_grg3l")
+
+[node name="Background9" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(9546.9375, -3018.271)
+scale = Vector2(29.434097, 13.905305)
+texture = ExtResource("12_frkhe")
+
+[node name="Background10" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(9572.001, -1626.1356)
+scale = Vector2(29.434097, 7.09315)
+texture = ExtResource("12_frkhe")
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Restart" to="." method="_on_restart_pressed"]

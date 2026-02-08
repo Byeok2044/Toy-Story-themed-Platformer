@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://rs0amm26qk3q"
+path="res://.godot/imported/Jump Sound.mp3-3b7aab3acaa87a7b20245fe73a9a7225.mp3str"
+
+[deps]
+
+source_file="res://Sounds/Jump Sound.mp3"
+dest_files=["res://.godot/imported/Jump Sound.mp3-3b7aab3acaa87a7b20245fe73a9a7225.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

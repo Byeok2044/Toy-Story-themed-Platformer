@@ -4,7 +4,7 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var jump_sound: AudioStreamPlayer2D = $"Jump sound"
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
-
+@onready var hit_sound: AudioStreamPlayer2D = $"hit sound"
 
 @onready var rope_line: Line2D = get_node_or_null("Line2D") 
 @onready var melee_area: Area2D = $MeleeArea
@@ -38,7 +38,6 @@ func _ready() -> void:
 			if cam.has_method("reset_smoothing"):
 				cam.reset_smoothing()
 		
-		print("Teleported to checkpoint with offset: ", global_position)
 		start_invulnerability(1.5)
 	
 	if rope_line:
@@ -72,15 +71,13 @@ func _input(event: InputEvent) -> void:
 
 func perform_melee():
 	is_attacking = true
+	
+	if animated_sprite_2d.sprite_frames.has_animation("attack"):
+		animated_sprite_2d.play("attack")
+	
 	if melee_area:
 		melee_area.monitoring = true
 		melee_area.position.x = -40 if animated_sprite_2d.flip_h else 40
-	
-	var tween = create_tween()
-	var original_scale = Vector2(1, 1)
-	var punch_scale = Vector2(original_scale.x * 1.4, original_scale.y * 0.8)
-	tween.tween_property(animated_sprite_2d, "scale", punch_scale, 0.1)
-	tween.tween_property(animated_sprite_2d, "scale", original_scale, 0.1)
 	
 	if melee_timer:
 		melee_timer.start()
@@ -90,6 +87,7 @@ func perform_melee():
 	
 	if melee_area:
 		melee_area.monitoring = false
+	
 	is_attacking = false
 
 func _on_melee_hit(target_node):
@@ -114,7 +112,7 @@ func try_lasso():
 func _physics_process(delta: float) -> void:
 	if not alive: return
 
-	var jump := "p%d_jump" % player_id
+	var jump_action := "p%d_jump" % player_id
 	var left := "p%d_left" % player_id
 	var right := "p%d_right" % player_id
 
@@ -130,29 +128,36 @@ func _physics_process(delta: float) -> void:
 			if velocity.dot(angle_dir) > 0:
 				velocity -= angle_dir * velocity.dot(angle_dir)
 				
-		if Input.is_action_just_pressed(jump):
+		if Input.is_action_just_pressed(jump_action):
 			is_lasso_active = false
 			velocity.y = JUMP_VELOCITY 
 	else:
+		# APPLY GRAVITY
 		if not is_on_floor():
 			velocity += get_gravity() * delta
-			if not is_attacking:
-				animated_sprite_2d.animation = "jump"
 		
-		if is_on_floor() and Input.is_action_just_pressed(jump):
+		# JUMP LOGIC
+		if is_on_floor() and Input.is_action_just_pressed(jump_action):
 			velocity.y = JUMP_VELOCITY
 			jump_sound.play()
+			get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
 
+		# HORIZONTAL MOVEMENT
 		var direction := Input.get_axis(left, right)
 		if direction != 0:
 			velocity.x = direction * SPEED
-			if not is_attacking:
-				animated_sprite_2d.animation = "run"
-				animated_sprite_2d.flip_h = (direction == -1)
+			animated_sprite_2d.flip_h = (direction == -1)
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
-			if is_on_floor() and not is_attacking:
-				animated_sprite_2d.animation = "idle"
+
+		# ANIMATION STATE MACHINE
+		if not is_attacking:
+			if not is_on_floor():
+				animated_sprite_2d.play("jump")
+			elif direction != 0:
+				animated_sprite_2d.play("run")
+			else:
+				animated_sprite_2d.play("idle")
 
 	move_and_slide()
 
@@ -180,13 +185,17 @@ func start_invulnerability(duration: float):
 func take_damage():
 	if not alive or invulnerable: return
 	
+	if hit_sound:
+		hit_sound.play()
+	
 	health -= 1
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("apply_shake"):
 		cam.apply_shake(0.5) 
 	if hearts_list.size() > 0:
 		var heart = hearts_list.pop_back()
-		heart.queue_free()
+		if is_instance_valid(heart):
+			heart.queue_free()
 	if health <= 0:
 		die()
 	else:
@@ -206,7 +215,7 @@ func die() -> void:
 	set_collision_layer_value(1, false)
 	
 	var tree = get_tree()
-	await tree.create_timer(2.0).timeout
+	await tree.create_timer(2.4).timeout
 	
 	if tree:
 		tree.reload_current_scene()

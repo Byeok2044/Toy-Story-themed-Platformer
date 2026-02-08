@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://bmf0lff323flc"]
+[gd_scene load_steps=18 format=4 uid="uid://bmf0lff323flc"]
 
 [ext_resource type="Texture2D" uid="uid://b50386ljjrli4" path="res://Assets/Images/Tilemap/Terrain (16x16).png" id="1_ckd5j"]
 [ext_resource type="Script" uid="uid://cwnya2esyfnwa" path="res://Scripts/bossfight.gd" id="1_iexqk"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://46ncvykwuvr3" path="res://Scripts/GameObj/bossspikes.gd" id="6_tx5l4"]
 [ext_resource type="PackedScene" uid="uid://qjo77fxtyy2p" path="res://Scenes/Game Objects/battery.tscn" id="7_82cdo"]
 [ext_resource type="PackedScene" uid="uid://tv66fccki408" path="res://Scenes/Game Objects/big_flying_enemy.tscn" id="8_gub6r"]
+[ext_resource type="AudioStream" uid="uid://dgqoqrwifgnuq" path="res://Sounds/Attic Boss Battle .mp3" id="10_2u3gr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hbjcg"]
 texture = ExtResource("1_ckd5j")
@@ -323,67 +324,37 @@ position = Vector2(364, 357)
 position = Vector2(37, 0)
 
 [node name="Spikes" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(60, 568)
+position = Vector2(32, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes2" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(108, 568)
+position = Vector2(195, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes3" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(257, 568)
+position = Vector2(285, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes4" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(401, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes5" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(353, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes6" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(305, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes7" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(497, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes8" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(449, 568)
+position = Vector2(435, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes9" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(545, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes10" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(708, 568)
+position = Vector2(524, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes11" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
-position = Vector2(659, 568)
+position = Vector2(662, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
@@ -392,61 +363,37 @@ active_time = 2.0
 position = Vector2(614, 0)
 
 [node name="Spikes" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-58, 568)
+position = Vector2(-226, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes2" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-8, 568)
+position = Vector2(-137, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes3" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(41, 568)
+position = Vector2(28, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes4" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-313, 568)
+position = Vector2(-545, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes5" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-265, 568)
+position = Vector2(-406, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
 
 [node name="Spikes6" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-218, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes7" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-405, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes8" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-361, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes10" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-503, 568)
-script = ExtResource("6_tx5l4")
-warning_time = 3.0
-active_time = 2.0
-
-[node name="Spikes11" parent="SpikeArr2" instance=ExtResource("4_iexqk")]
-position = Vector2(-454, 568)
+position = Vector2(-316, 581)
 script = ExtResource("6_tx5l4")
 warning_time = 3.0
 active_time = 2.0
@@ -455,36 +402,44 @@ active_time = 2.0
 position = Vector2(688, 544)
 
 [node name="Battery" parent="BattArr1" groups=["BattArr1"] instance=ExtResource("7_82cdo")]
+visible = false
 position = Vector2(32, 0)
 
 [node name="Battery2" parent="BattArr1" groups=["BattArr1"] instance=ExtResource("7_82cdo")]
+visible = false
 position = Vector2(-387, 0)
 
 [node name="BattArr2" type="Node2D" parent="."]
 position = Vector2(679, 544)
 
 [node name="Battery" parent="BattArr2" groups=["BattArr2"] instance=ExtResource("7_82cdo")]
+visible = false
 position = Vector2(-131, 0)
 
 [node name="Battery2" parent="BattArr2" groups=["BattArr2"] instance=ExtResource("7_82cdo")]
+visible = false
 position = Vector2(-577, 0)
 
 [node name="EnemyArr1" type="Node2D" parent="." groups=["enemies"]]
 position = Vector2(0, -70)
 
 [node name="FlyingEnemy" parent="EnemyArr1" groups=["EnemyArr1"] instance=ExtResource("8_gub6r")]
+visible = false
 position = Vector2(366, 613)
 
 [node name="FlyingEnemy2" parent="EnemyArr1" groups=["EnemyArr1"] instance=ExtResource("8_gub6r")]
+visible = false
 position = Vector2(643, 614)
 
 [node name="EnemyArr2" type="Node2D" parent="." groups=["enemies"]]
 position = Vector2(-269, 46)
 
 [node name="FlyingEnemy" parent="EnemyArr2" groups=["EnemyArr2"] instance=ExtResource("8_gub6r")]
+visible = false
 position = Vector2(474, 496)
 
 [node name="FlyingEnemy2" parent="EnemyArr2" groups=["EnemyArr2"] instance=ExtResource("8_gub6r")]
+visible = false
 position = Vector2(745, 498)
 
 [node name="ArenaBarrier" type="StaticBody2D" parent="."]
@@ -494,6 +449,12 @@ position = Vector2(111, 544)
 rotation = 1.5707964
 shape = SubResource("WorldBoundaryShape2D_xee63")
 disabled = true
+
+[node name="BossMusic" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("10_2u3gr")
+volume_db = 9.087
+pitch_scale = 1.1
+bus = &"Music"
 
 [connection signal="health_changed" from="Boss" to="BossUI/ProgressBar" method="_on_boss_health_changed"]
 [connection signal="value_changed" from="BossUI/ProgressBar" to="Boss" method="_on_progress_bar_value_changed"]

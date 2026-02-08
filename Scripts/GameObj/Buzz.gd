@@ -4,7 +4,14 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var jump_sound: AudioStreamPlayer2D = $"Jump sound"
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
+@onready var hit_sound: AudioStreamPlayer2D = $"hit sound" 
+
+# --- MUZZLE REFERENCES ---
+@onready var muzzle_r: Marker2D = $"Muzzle R"
+@onready var muzzle_l: Marker2D = $"Muzzle L"
+
 @onready var fuel_bar: ProgressBar = $"Health Bar/FuelBar"
+@onready var jetpack_takeoff: AudioStreamPlayer2D = $jetpack_takeoff
 
 @onready var shoot_timer: Timer = $ShootTimer
 @export var bullet_scene: PackedScene = preload("res://Scenes/Game Objects/buzz_bullet.tscn")
@@ -23,35 +30,29 @@ var hearts_list : Array = []
 var has_tank := false
 var fuel := 0.0
 var is_floating := false
-
+var is_shooting := false 
+var aimed_up_this_frame := false # New flag to prevent jump conflict
 
 var invulnerable = false 
 
 func _ready() -> void:
-	print("Spawning at: ", Global.respawn_point)
 	add_to_group("players")
-	print("Player spawned. Global.respawn_point is: ", Global.respawn_point)
+	
 	if Global.respawn_point != null:
 		global_position = Global.respawn_point + Vector2(player_id * 20, 0)
-		print("Teleported to checkpoint!")
 		var cam = get_viewport().get_camera_2d()
 		if cam:
 			cam.global_position = global_position 
 			cam.reset_smoothing() 
 		start_invulnerability(1.5)
-	if Global.players_swapped:
-		player_id = 1
-	else:
-		player_id = 2
+		
+	player_id = 1 if Global.players_swapped else 2
 		
 	var hearts_parent = get_node_or_null("Health Bar/HBoxContainer")
 	if hearts_parent:
 		for child in hearts_parent.get_children():
 			hearts_list.append(child)
 		health = hearts_list.size()
-	if Global.respawn_point != null:
-		global_position = Global.respawn_point
-		start_invulnerability(1.5)
 
 	fuel = MAX_FUEL
 	if fuel_bar:
@@ -74,20 +75,30 @@ func shoot():
 	if not bullet_scene: return
 	
 	can_shoot = false
+	is_shooting = true 
+	
+	if animated_sprite_2d.sprite_frames.has_animation("shoot"):
+		animated_sprite_2d.play("shoot")
+	
 	if shoot_timer:
 		shoot_timer.start(shoot_cooldown)
 	
 	var bullet = bullet_scene.instantiate()
 	var is_flipped = animated_sprite_2d.flip_h
-	var jump_action := "p%d_jump" % player_id
+	
+	# Fix: Use "Up" action instead of "Jump" action for aiming 
+	# to avoid the double jump conflict
+	var up_action := "p%d_up" % player_id 
 	var down_action := "p%d_down" % player_id
 	
 	bullet.shooter = self
 	
 	var horiz_dir = -1.0 if is_flipped else 1.0
 	var vert_dir = 0.0
-	if Input.is_action_pressed(jump_action):
+	
+	if Input.is_action_pressed(up_action):
 		vert_dir = -0.5
+		aimed_up_this_frame = true # Mark that we are using the up key for aiming
 	elif Input.is_action_pressed(down_action):
 		vert_dir = 0.5
 		
@@ -95,11 +106,15 @@ func shoot():
 	bullet.rotation = bullet.direction.angle() 
 
 	get_parent().add_child(bullet)
-	var spawn_offset = Vector2(horiz_dir * 30, vert_dir * 10)
-	bullet.global_position = global_position + spawn_offset
+	
+	if is_flipped:
+		bullet.global_position = muzzle_l.global_position
+	else:
+		bullet.global_position = muzzle_r.global_position
 
 func _on_shoot_timer_timeout():
 	can_shoot = true
+	is_shooting = false 
 
 func _physics_process(delta: float) -> void:
 	if not alive: return
@@ -108,7 +123,12 @@ func _physics_process(delta: float) -> void:
 	var right := "p%d_right" % player_id
 	var jump := "p%d_jump" % player_id
 
+	# Jetpack logic
 	if has_tank and Input.is_action_pressed(jump) and not is_on_floor() and fuel > 0:
+		if not is_floating:
+			if jetpack_takeoff and not jetpack_takeoff.playing:
+				jetpack_takeoff.play()
+		
 		is_floating = true
 		velocity.y = FLOAT_FORCE 
 		fuel -= delta
@@ -120,32 +140,41 @@ func _physics_process(delta: float) -> void:
 			has_tank = false
 			if fuel_bar: fuel_bar.visible = false
 			animated_sprite_2d.modulate = Color.WHITE
-			print("Tank empty! Lost the jetpack.")
+			if jetpack_takeoff: jetpack_takeoff.stop()
 	else:
+		if is_floating:
+			if jetpack_takeoff: jetpack_takeoff.stop()
 		is_floating = false
 		if not invulnerable: 
 			animated_sprite_2d.modulate = Color.WHITE
 
+	# --- ANIMATION STATE MACHINE ---
 	if not is_on_floor():
-		if not is_floating:
+		if not is_floating and not is_shooting:
 			velocity += get_gravity() * delta
 			animated_sprite_2d.animation = "jump"
 	else:
 		if has_tank:
 			fuel = move_toward(fuel, MAX_FUEL, FUEL_REGEN_RATE * delta)
 
-	if Input.is_action_just_pressed(jump) and is_on_floor():
+	# PREVENT DOUBLE JUMP: Only jump if we aren't currently aiming upward to shoot
+	if Input.is_action_just_pressed(jump) and is_on_floor() and not aimed_up_this_frame:
 		velocity.y = JUMP_VELOCITY
 		jump_sound.play()
+		get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
+	
+	# Reset the aiming flag at the end of the frame
+	aimed_up_this_frame = false
 		
 	var direction := Input.get_axis(left, right)
 	if direction != 0:
 		velocity.x = direction * SPEED
-		animated_sprite_2d.animation = "run"
-		animated_sprite_2d.flip_h = (direction == -1)
+		if not is_shooting:
+			animated_sprite_2d.animation = "run"
+			animated_sprite_2d.flip_h = (direction == -1)
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
-		if is_on_floor():
+		if is_on_floor() and not is_shooting:
 			animated_sprite_2d.animation = "idle"
 
 	move_and_slide()
@@ -175,13 +204,17 @@ func start_invulnerability(duration: float):
 func take_damage():
 	if not alive or invulnerable: return
 	
+	if hit_sound:
+		hit_sound.play()
+	
 	health -= 1
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("apply_shake"):
 		cam.apply_shake(0.5) 
 	if hearts_list.size() > 0:
 		var heart = hearts_list.pop_back()
-		heart.queue_free()
+		if is_instance_valid(heart):
+			heart.queue_free()
 	
 	if health <= 0:
 		die() 
@@ -197,12 +230,17 @@ func play_hurt_animation():
 func die() -> void:
 	if not alive: return
 	alive = false
+	
+	if jetpack_takeoff: jetpack_takeoff.stop()
+	
+	death_sound.pitch_scale = 1.0
 	death_sound.play()
+	
 	animated_sprite_2d.play("hit")
-	set_collision_layer_value(1, false) 
+	set_collision_layer_value(1, false)
 	
 	var tree = get_tree()
-	await tree.create_timer(2.0).timeout 
+	await tree.create_timer(2.4).timeout
 	
-	if tree:
+	if tree: 
 		tree.reload_current_scene()

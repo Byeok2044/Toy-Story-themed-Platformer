@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://1l7ywabcqpsk"
+path="res://.godot/imported/Buzz Death Sound.mp3-b89837e9903e4bb4cea252a4b0a8281d.mp3str"
+
+[deps]
+
+source_file="res://Sounds/Buzz Death Sound.mp3"
+dest_files=["res://.godot/imported/Buzz Death Sound.mp3-b89837e9903e4bb4cea252a4b0a8281d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
