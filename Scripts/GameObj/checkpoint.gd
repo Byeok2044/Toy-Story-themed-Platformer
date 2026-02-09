@@ -6,7 +6,5 @@ func _on_body_entered(body: Node2D) -> void:
 		
 		if spawn_node:
 			Global.respawn_point = spawn_node.global_position
-			print("Checkpoint saved at specific RespawnPoint: ", Global.respawn_point)
 		else:
 			Global.respawn_point = global_position
-			print("Checkpoint saved at Area2D location: ", Global.respawn_point)

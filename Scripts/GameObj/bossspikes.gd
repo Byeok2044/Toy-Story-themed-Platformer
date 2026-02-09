@@ -4,7 +4,6 @@ extends Area2D
 @export var active_time := 2.0
 
 @onready var sprite: Sprite2D = $Sprite2D
-# --- CHANGED TO CollisionShape2D ---
 @onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D 
 
 enum State { IDLE, WARNING, ACTIVE }
@@ -24,7 +23,6 @@ func _reset_to_safe() -> void:
 	
 	monitoring = false
 	monitorable = false
-	# Fix: Use the new variable name
 	collision_shape_2d.set_deferred("disabled", true)
 
 func trigger_sequence() -> void:
@@ -36,7 +34,6 @@ func is_sequence_active() -> bool:
 	return _current_state != State.IDLE
 
 func _run_spike_cycle() -> void:
-	# 1. WARNING PHASE
 	_current_state = State.WARNING
 	
 	sprite.visible = true
@@ -49,7 +46,7 @@ func _run_spike_cycle() -> void:
 	await get_tree().create_timer(warning_time).timeout
 	if _current_state != State.WARNING: return
 
-	# 2. ACTIVE PHASE
+
 	_current_state = State.ACTIVE
 	
 	if _tween: _tween.kill()
@@ -57,16 +54,13 @@ func _run_spike_cycle() -> void:
 	sprite.visible = true 
 	sprite.modulate = Color(1, 1, 1, 1) 
 	
-	# Enable Collision
+
 	monitoring = true
-	# Fix: Changed from collision_polygon_2d to collision_shape_2d
 	collision_shape_2d.set_deferred("disabled", false)
 	
 	await get_tree().create_timer(active_time).timeout
 	if _current_state != State.ACTIVE: return
 
-	# 3. RESET PHASE
-	# Fix: Changed from collision_polygon_2d to collision_shape_2d
 	collision_shape_2d.set_deferred("disabled", true)
 	monitoring = false
 	

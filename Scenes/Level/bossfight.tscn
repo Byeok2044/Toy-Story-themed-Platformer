@@ -262,6 +262,7 @@ size = Vector2(741, 570)
 distance = -64.0
 
 [node name="Bossfight" type="Node2D"]
+position = Vector2(-1308, 46)
 script = ExtResource("1_iexqk")
 fixed_zoom = Vector2(0.44, 0.42)
 metadata/_edit_vertical_guides_ = [-255.0]
@@ -302,7 +303,7 @@ offset_top = 22.0
 offset_right = 20.0
 offset_bottom = 46.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_color = Color(0.79173034, 0.119621314, 0.97890157, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("4_nlhk0")
 theme_override_styles/normal = SubResource("StyleBoxFlat_tx5l4")
@@ -322,7 +323,7 @@ position = Vector2(396, 357)
 position = Vector2(258, 407)
 
 [node name="SpikeArr1" type="Node2D" parent="." groups=["SpikeArr"]]
-position = Vector2(37, 0)
+position = Vector2(57, 0)
 
 [node name="Spikes" parent="SpikeArr1" instance=ExtResource("4_iexqk")]
 position = Vector2(32, 581)
@@ -449,10 +450,35 @@ shape = SubResource("WorldBoundaryShape2D_xee63")
 disabled = true
 
 [node name="BossMusic" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(49, -17)
 stream = ExtResource("10_2u3gr")
 volume_db = 9.087
 pitch_scale = 1.1
 bus = &"Music"
+
+[node name="Victory" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ColorRect" type="ColorRect" parent="Victory"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 6.0
+offset_right = 4.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Victory/ColorRect"]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 22.0
+offset_right = 1137.0
+offset_bottom = 481.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 100
+text = "You Won"
 
 [connection signal="health_changed" from="Boss" to="BossUI/ProgressBar" method="_on_boss_health_changed"]
 [connection signal="value_changed" from="BossUI/ProgressBar" to="Boss" method="_on_progress_bar_value_changed"]

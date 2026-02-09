@@ -32,7 +32,6 @@ func _physics_process(delta: float) -> void:
 func get_desired_velocity() -> Vector2:
 	var target_pos := target.global_position
 	
-	# Target prediction logic based on the player's movement
 	if target.get("velocity"):
 		target_pos += target.velocity * lead_strength
 	
@@ -43,15 +42,10 @@ func move_straight(delta: float) -> void:
 	position += velocity * delta
 	
 func _on_body_entered(body: Node) -> void:
-	# 1. Check if the object hit is in the "player" group
-	# This covers both the current 'target' and any other player characters
 	if body.is_in_group("players"):
 		if body.has_method("take_damage"):
 			body.take_damage()
 		queue_free()
 		return
-
-	# 2. Tilemap/Wall Collision Logic
-	# This ensures the projectile disappears when hitting the environment
 	if body is TileMap or body is TileMapLayer or body.is_in_group("walls") or body is StaticBody2D:
 		queue_free()

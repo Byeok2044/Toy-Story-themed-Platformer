@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=23 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://nl1ps71xgj0f" path="res://Assets/Images/Background/Screenshot 2026-02-08 195435.png" id="10_4kpch"]
 [ext_resource type="Texture2D" uid="uid://d2ojt14j67fqr" path="res://Assets/Images/Background/Screenshot 2026-02-08 195708.png" id="11_grg3l"]
 [ext_resource type="Texture2D" uid="uid://b5080226jihrb" path="res://Assets/Images/Background/Screenshot 2026-02-08 195837.png" id="12_frkhe"]
+[ext_resource type="AudioStream" uid="uid://s8xhclaj0mpw" path="res://Sounds/Platforming or General Level Music.mp3" id="13_1p5hy"]
+[ext_resource type="AudioStream" uid="uid://dpnc3il16yloc" path="res://Sounds/Combat Music.mp3" id="14_h1m7h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
@@ -50,6 +52,7 @@ position = Vector2(853, -680)
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="PauseMenu" type="Panel" parent="HUD"]
+unique_name_in_owner = true
 process_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -168,15 +171,21 @@ texture = ExtResource("8_50glp")
 
 [node name="Background5" type="Sprite2D" parent="."]
 z_index = -9
-position = Vector2(6943.072, -2175.9678)
-scale = Vector2(6.7718716, 8.262916)
+position = Vector2(8698, -2530)
+scale = Vector2(13.221679, 20.746212)
 texture = ExtResource("9_bmxlf")
 
 [node name="Background6" type="Sprite2D" parent="."]
 z_index = -9
-position = Vector2(7840.1367, -2089)
-scale = Vector2(6.8513436, 7.941131)
+position = Vector2(7832, -2141.5)
+scale = Vector2(6.785714, 7.2204075)
 texture = ExtResource("10_4kpch")
+
+[node name="Background11" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(7203.143, -2093)
+scale = Vector2(29.040812, 40.7027)
+texture = ExtResource("11_grg3l")
 
 [node name="Background7" type="Sprite2D" parent="."]
 z_index = -9
@@ -186,8 +195,14 @@ texture = ExtResource("11_grg3l")
 
 [node name="Background8" type="Sprite2D" parent="."]
 z_index = -9
-position = Vector2(8239.5, -1999.4999)
-scale = Vector2(6.8035684, 10.945943)
+position = Vector2(8085.5, -2277.5)
+scale = Vector2(6.875004, 25.972971)
+texture = ExtResource("11_grg3l")
+
+[node name="Background12" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(8021, -3026.0002)
+scale = Vector2(6.875004, 25.972971)
 texture = ExtResource("11_grg3l")
 
 [node name="Background9" type="Sprite2D" parent="."]
@@ -201,6 +216,12 @@ z_index = -9
 position = Vector2(9572.001, -1963.6356)
 scale = Vector2(29.434097, 1.5146387)
 texture = ExtResource("12_frkhe")
+
+[node name="General" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("13_1p5hy")
+
+[node name="Combat" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_h1m7h")
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/Restart" to="." method="_on_restart_pressed"]

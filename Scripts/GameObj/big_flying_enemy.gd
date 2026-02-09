@@ -30,14 +30,12 @@ var _active: bool = false
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var timer: Timer = $Timer
-# Reference to your existing Area2D node
 @onready var detection_area: Area2D = $DetectionArea
 
 func _ready():
 	home_position = global_position
 	add_to_group("enemies") 
 	
-	# Connect detection signals dynamically if not done in editor
 	if not detection_area.body_entered.is_connected(_on_detection_area_body_entered):
 		detection_area.body_entered.connect(_on_detection_area_body_entered)
 	if not detection_area.body_exited.is_connected(_on_detection_area_body_exited):
@@ -81,7 +79,6 @@ func _physics_process(delta):
 	var desired_velocity = Vector2.ZERO
 	var dist_from_home = global_position.distance_to(home_position)
 	
-	# Force a return if too far from home, even if target is in area
 	if dist_from_home > max_distance:
 		is_bat_chase = false
 		target = null
@@ -116,7 +113,6 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 		target = null
 		is_bat_chase = false
 
-# --- EXISTING COMBAT/ANIMATION LOGIC ---
 func deal_contact_damage():
 	var now := Time.get_ticks_msec() / 1000.0
 	for body in bodies_in_hitbox.duplicate():

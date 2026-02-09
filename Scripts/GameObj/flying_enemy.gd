@@ -8,8 +8,6 @@ const RETURN_SPEED = 100.0
 @export var max_distance: float = 600.0 
 @export var detection_radius: float = 350.0 
 @export var flip_cooldown: float = 0.25 
-
-# --- UPDATED COOLDOWN HERE (2.0 Seconds) ---
 @export var contact_damage_interval := 2.0
 
 var damage_cooldowns := {} 
@@ -102,9 +100,7 @@ func deal_contact_damage():
 
 		if body.has_method("take_damage"):
 			body.take_damage()
-			# Update the cooldown map with the current time + 2 seconds
 			damage_cooldowns[body] = now + contact_damage_interval
-			# Knockback effect
 			velocity = global_position.direction_to(body.global_position) * -200
 
 func handle_animation():
@@ -151,7 +147,6 @@ func _on_timer_timeout() -> void:
 func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("players") and not bodies_in_hitbox.has(body):
 		bodies_in_hitbox.append(body)
-		# Initialize with 0 so they can be hit immediately upon first contact
 		if not damage_cooldowns.has(body):
 			damage_cooldowns[body] = 0.0 
 

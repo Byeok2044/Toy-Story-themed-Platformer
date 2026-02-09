@@ -5,8 +5,6 @@ extends CharacterBody2D
 @onready var jump_sound: AudioStreamPlayer2D = $"Jump sound"
 @onready var death_sound: AudioStreamPlayer2D = $"death sound"
 @onready var hit_sound: AudioStreamPlayer2D = $"hit sound" 
-
-# --- MUZZLE REFERENCES ---
 @onready var muzzle_r: Marker2D = $"Muzzle R"
 @onready var muzzle_l: Marker2D = $"Muzzle L"
 
@@ -31,7 +29,7 @@ var has_tank := false
 var fuel := 0.0
 var is_floating := false
 var is_shooting := false 
-var aimed_up_this_frame := false # New flag to prevent jump conflict
+var aimed_up_this_frame := false 
 
 var invulnerable = false 
 
@@ -86,8 +84,6 @@ func shoot():
 	var bullet = bullet_scene.instantiate()
 	var is_flipped = animated_sprite_2d.flip_h
 	
-	# Fix: Use "Up" action instead of "Jump" action for aiming 
-	# to avoid the double jump conflict
 	var up_action := "p%d_up" % player_id 
 	var down_action := "p%d_down" % player_id
 	
@@ -98,7 +94,7 @@ func shoot():
 	
 	if Input.is_action_pressed(up_action):
 		vert_dir = -0.5
-		aimed_up_this_frame = true # Mark that we are using the up key for aiming
+		aimed_up_this_frame = true 
 	elif Input.is_action_pressed(down_action):
 		vert_dir = 0.5
 		
@@ -123,7 +119,6 @@ func _physics_process(delta: float) -> void:
 	var right := "p%d_right" % player_id
 	var jump := "p%d_jump" % player_id
 
-	# Jetpack logic
 	if has_tank and Input.is_action_pressed(jump) and not is_on_floor() and fuel > 0:
 		if not is_floating:
 			if jetpack_takeoff and not jetpack_takeoff.playing:
@@ -148,7 +143,6 @@ func _physics_process(delta: float) -> void:
 		if not invulnerable: 
 			animated_sprite_2d.modulate = Color.WHITE
 
-	# --- ANIMATION STATE MACHINE ---
 	if not is_on_floor():
 		if not is_floating and not is_shooting:
 			velocity += get_gravity() * delta
@@ -157,13 +151,11 @@ func _physics_process(delta: float) -> void:
 		if has_tank:
 			fuel = move_toward(fuel, MAX_FUEL, FUEL_REGEN_RATE * delta)
 
-	# PREVENT DOUBLE JUMP: Only jump if we aren't currently aiming upward to shoot
 	if Input.is_action_just_pressed(jump) and is_on_floor() and not aimed_up_this_frame:
 		velocity.y = JUMP_VELOCITY
 		jump_sound.play()
 		get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
 	
-	# Reset the aiming flag at the end of the frame
 	aimed_up_this_frame = false
 		
 	var direction := Input.get_axis(left, right)

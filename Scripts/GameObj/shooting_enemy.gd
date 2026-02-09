@@ -1,23 +1,19 @@
 extends Area2D
 
-# Exported Variables
+
 @export var laser_scene: PackedScene = preload("res://Scenes/Game Objects/laser.tscn")
 @export var shoot_direction: Vector2 = Vector2.LEFT 
 @export var health: int = 3 
 @export var speed: float = 100.0
 
-# Contact Damage Settings
 @export var contact_damage_interval := 0.6
 var damage_cooldowns := {}
 var bodies_in_hitbox: Array[Node2D] = []
 
-# Node References
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var muzzle: Marker2D = $Muzzle
 @onready var wall_detector: RayCast2D = $WallDetector
 @onready var ledge_detector: RayCast2D = $LedgeDetector 
-
-# --- NEW AUDIO REFERENCE ---
 @onready var shoot_sound: AudioStreamPlayer2D = $ShootSound
 
 
@@ -75,16 +71,13 @@ func _on_shot_timer_timeout() -> void:
 
 func shoot() -> void:
 	if laser_scene:
-		# --- TRIGGER SHOOT ANIMATION ---
 		if animated_sprite_2d.sprite_frames.has_animation("shoot"):
 			animated_sprite_2d.play("shoot")
-			# Return to default after the shot is done
 			get_tree().create_timer(0.4).timeout.connect(func(): 
 				if animated_sprite_2d.animation == "shoot":
 					animated_sprite_2d.play("default")
 			)
 		
-		# Play the spatialized shoot sound
 		if shoot_sound:
 			shoot_sound.pitch_scale = randf_range(0.9, 1.1)
 			shoot_sound.play()
@@ -120,7 +113,6 @@ func take_damage(amount: int) -> void:
 	if health <= 0:
 		die()
 	else:
-		# Hit feedback while still alive
 		if animated_sprite_2d.sprite_frames.has_animation("hit"):
 			animated_sprite_2d.play("hit")
 			await get_tree().create_timer(0.2).timeout

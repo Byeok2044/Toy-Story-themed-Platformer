@@ -132,17 +132,14 @@ func _physics_process(delta: float) -> void:
 			is_lasso_active = false
 			velocity.y = JUMP_VELOCITY 
 	else:
-		# APPLY GRAVITY
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 		
-		# JUMP LOGIC
 		if is_on_floor() and Input.is_action_just_pressed(jump_action):
 			velocity.y = JUMP_VELOCITY
 			jump_sound.play()
 			get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
 
-		# HORIZONTAL MOVEMENT
 		var direction := Input.get_axis(left, right)
 		if direction != 0:
 			velocity.x = direction * SPEED
@@ -150,7 +147,6 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-		# ANIMATION STATE MACHINE
 		if not is_attacking:
 			if not is_on_floor():
 				animated_sprite_2d.play("jump")
