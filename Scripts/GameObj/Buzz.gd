@@ -29,7 +29,10 @@ var has_tank := false
 var fuel := 0.0
 var is_floating := false
 var is_shooting := false 
-var aimed_up_this_frame := false 
+var aimed_up_this_frame := false
+
+# NEW: tracks if we just jumped this frame to block jetpack on same frame
+var _jumped_this_frame := false
 
 var invulnerable = false 
 
@@ -114,23 +117,33 @@ func _on_shoot_timer_timeout():
 
 func _physics_process(delta: float) -> void:
 	if not alive: return
-		
-	var left := "p%d_left" % player_id
-	var right := "p%d_right" % player_id
-	var jump := "p%d_jump" % player_id
 
-	if has_tank and Input.is_action_pressed(jump) and not is_on_floor() and fuel > 0:
+	_jumped_this_frame = false
+	aimed_up_this_frame = false
+
+	var left  := "p%d_left"  % player_id
+	var right  := "p%d_right" % player_id
+	var jump   := "p%d_jump"  % player_id
+
+	# Ground jump
+	if Input.is_action_just_pressed(jump) and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+		_jumped_this_frame = true
+		jump_sound.play()
+		get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
+
+	# Jetpack — added `not is_shooting` guard here
+	if has_tank and Input.is_action_pressed(jump) \
+			and not is_on_floor() and fuel > 0 \
+			and not _jumped_this_frame and not is_shooting:  # ← ADD THIS
 		if not is_floating:
 			if jetpack_takeoff and not jetpack_takeoff.playing:
 				jetpack_takeoff.play()
-		
 		is_floating = true
-		velocity.y = FLOAT_FORCE 
+		velocity.y = FLOAT_FORCE
 		fuel -= delta
-		
 		var current_alpha = animated_sprite_2d.modulate.a
 		animated_sprite_2d.modulate = Color(0, 1, 1, current_alpha)
-		
 		if fuel <= 0:
 			has_tank = false
 			if fuel_bar: fuel_bar.visible = false
@@ -140,24 +153,21 @@ func _physics_process(delta: float) -> void:
 		if is_floating:
 			if jetpack_takeoff: jetpack_takeoff.stop()
 		is_floating = false
-		if not invulnerable: 
+		if not invulnerable:
 			animated_sprite_2d.modulate = Color.WHITE
 
+	# Gravity — REMOVE `not is_shooting` from this condition
 	if not is_on_floor():
-		if not is_floating and not is_shooting:
+		if not is_floating:  # ← removed `and not is_shooting`
 			velocity += get_gravity() * delta
+		# Animation: only switch if not shooting
+		if not is_shooting:
 			animated_sprite_2d.animation = "jump"
 	else:
 		if has_tank:
 			fuel = move_toward(fuel, MAX_FUEL, FUEL_REGEN_RATE * delta)
 
-	if Input.is_action_just_pressed(jump) and is_on_floor() and not aimed_up_this_frame:
-		velocity.y = JUMP_VELOCITY
-		jump_sound.play()
-		get_tree().create_timer(0.5).timeout.connect(func(): if jump_sound: jump_sound.stop())
-	
-	aimed_up_this_frame = false
-		
+	# Horizontal movement
 	var direction := Input.get_axis(left, right)
 	if direction != 0:
 		velocity.x = direction * SPEED
@@ -170,7 +180,7 @@ func _physics_process(delta: float) -> void:
 			animated_sprite_2d.animation = "idle"
 
 	move_and_slide()
-	
+
 	if fuel_bar:
 		fuel_bar.value = fuel
 		fuel_bar.visible = has_tank
