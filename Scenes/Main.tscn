@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dkp0clj671tu0"]
+[gd_scene load_steps=31 format=3 uid="uid://dkp0clj671tu0"]
 
 [ext_resource type="Script" uid="uid://d1yjpok87wmx0" path="res://Scripts/Menu/global.gd" id="1_kln2b"]
 [ext_resource type="PackedScene" uid="uid://b08qb13f0hkxi" path="res://Scenes/Level/level_placeholder.tscn" id="3_kln2b"]
@@ -19,7 +19,23 @@
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
 shadow_size = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1p5hy"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h1m7h"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbw6q"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_erwvk"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2w5on"]
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
 shadow_size = 4
 
@@ -27,7 +43,23 @@ shadow_size = 4
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
 shadow_size = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_346fj"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0sclb"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw32o"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sxkr1"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fq0cl"]
 bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
 shadow_size = 4
 
@@ -91,6 +123,8 @@ theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.0235294
 theme_override_fonts/font = ExtResource("3_rgh2o")
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_rgh2o")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1p5hy")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h1m7h")
 text = "Resume
 "
 
@@ -102,6 +136,8 @@ theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.0235294
 theme_override_fonts/font = ExtResource("3_rgh2o")
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_pbw6q")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_erwvk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2w5on")
 text = "Restart"
 
 [node name="Main Menu" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
@@ -112,6 +148,8 @@ theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.0235294
 theme_override_fonts/font = ExtResource("3_rgh2o")
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_v1gob")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_346fj")
+theme_override_styles/hover = SubResource("StyleBoxFlat_0sclb")
 text = "Main Menu"
 
 [node name="Quit" type="Button" parent="HUD/PauseMenu/VBoxContainer"]
@@ -122,6 +160,8 @@ theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.0235294
 theme_override_fonts/font = ExtResource("3_rgh2o")
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_jw32o")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sxkr1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fq0cl")
 text = "Quit"
 
 [node name="Pause" type="Button" parent="HUD"]

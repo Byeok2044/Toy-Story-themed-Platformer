@@ -2,6 +2,7 @@ extends Area2D
 
 @export var warning_time := 3.0
 @export var active_time := 2.0
+@export var damage_interval: float = 0.5 
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D 
@@ -9,13 +10,22 @@ extends Area2D
 enum State { IDLE, WARNING, ACTIVE }
 var _current_state: State = State.IDLE
 var _tween: Tween
+var _damage_timer: float = 0.0 
 
 func _ready() -> void:
 	visible = true 
 	_reset_to_safe()
 
+func _process(delta: float) -> void:
+	if _current_state == State.ACTIVE:
+		_damage_timer += delta
+		if _damage_timer >= damage_interval:
+			_apply_continuous_damage()
+			_damage_timer = 0.0
+
 func _reset_to_safe() -> void:
 	_current_state = State.IDLE
+	_damage_timer = 0.0
 	if _tween: _tween.kill()
 	
 	sprite.visible = false
@@ -46,17 +56,17 @@ func _run_spike_cycle() -> void:
 	await get_tree().create_timer(warning_time).timeout
 	if _current_state != State.WARNING: return
 
-
 	_current_state = State.ACTIVE
 	
 	if _tween: _tween.kill()
 	
 	sprite.visible = true 
 	sprite.modulate = Color(1, 1, 1, 1) 
-	
 
 	monitoring = true
 	collision_shape_2d.set_deferred("disabled", false)
+
+	_apply_continuous_damage()
 	
 	await get_tree().create_timer(active_time).timeout
 	if _current_state != State.ACTIVE: return
@@ -68,7 +78,14 @@ func _run_spike_cycle() -> void:
 	
 	_reset_to_safe()
 
-func _on_body_entered(body: Node2D) -> void:
-	if _current_state == State.ACTIVE and sprite.visible:
+func _apply_continuous_damage() -> void:
+	var overlapping_bodies = get_overlapping_bodies()
+	for body in overlapping_bodies:
 		if body.is_in_group("players") and body.has_method("take_damage"):
 			body.take_damage()
+
+func _on_body_entered(body: Node2D) -> void:
+	if _current_state == State.ACTIVE:
+		if body.is_in_group("players") and body.has_method("take_damage"):
+			body.take_damage()
+			_damage_timer = 0.0

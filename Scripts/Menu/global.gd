@@ -1,17 +1,14 @@
 extends Node2D
 
-# --- Variables ---
 var playerBody: CharacterBody2D
 var respawn_point = null
 var players_swapped: bool = false
 var dead_enemies: Array = []
 
-# --- UI References ---
 @onready var pause_menu = %PauseMenu
 @onready var pause_button: Button = $HUD/Pause
-@onready var victory_menu = %VictoryMenu # Ensure you have a UI node with this Unique Name
+@onready var victory_menu = %VictoryMenu 
 
-# --- Music References ---
 @onready var general: AudioStreamPlayer2D = $General
 @onready var combat: AudioStreamPlayer2D = $Combat
 
@@ -22,38 +19,31 @@ func _ready() -> void:
 	if victory_menu:
 		victory_menu.visible = false
 	
-	# Start music
 	play_music("general")
 	_setup_level.call_deferred()
 
 func _setup_level() -> void:
 	var level_placeholder = get_node_or_null("LevelPlaceholder")
 	if level_placeholder:
-		# Setup regular enemies
 		var enemies = level_placeholder.get_node_or_null("Enemies")
 		if enemies:
 			for enemy in enemies.get_children():
 				if enemy.has_signal("player_died"):
 					if not enemy.player_died.is_connected(_on_player_died):
 						enemy.player_died.connect(_on_player_died)
-		
-		# Setup Boss Victory Condition
-		# This looks for the BossFight trigger node and the Boss itself
 		var boss_node = level_placeholder.find_child("Boss", true, false)
 		if boss_node and boss_node.has_signal("boss_defeated"):
 			boss_node.boss_defeated.connect(_on_game_finished)
 
-# --- Game Logic ---
 func _on_game_finished() -> void:
 	print("Boss Defeated! Game Finished.")
-	get_tree().paused = true # Stop the game world
+	get_tree().paused = true 
 	play_music("stop_all")
 	if victory_menu:
 		victory_menu.visible = true
 	if pause_button:
 		pause_button.visible = false
 
-# --- Music Logic ---
 func play_music(mode: String) -> void:
 	if general == null or combat == null:
 		return
@@ -71,7 +61,6 @@ func play_music(mode: String) -> void:
 			general.stop()
 			combat.stop()
 
-# --- Signal Callbacks ---
 func _on_player_died(body: Node2D) -> void:
 	if is_instance_valid(body) and body.has_method("die") and body.get("alive") == true:
 		print("You Died.")
@@ -82,7 +71,6 @@ func _on_pause_pressed() -> void:
 	toggle_pause()
 
 func toggle_pause() -> void:
-	# Don't allow pausing if the victory menu is showing
 	if victory_menu and victory_menu.visible:
 		return
 		

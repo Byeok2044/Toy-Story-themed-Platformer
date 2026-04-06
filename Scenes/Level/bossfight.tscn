@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://bmf0lff323flc"]
+[gd_scene load_steps=22 format=4 uid="uid://bmf0lff323flc"]
 
 [ext_resource type="Texture2D" uid="uid://b50386ljjrli4" path="res://Assets/Images/Tilemap/Terrain (16x16).png" id="1_ckd5j"]
 [ext_resource type="Script" uid="uid://cwnya2esyfnwa" path="res://Scripts/bossfight.gd" id="1_iexqk"]
@@ -261,6 +261,22 @@ size = Vector2(741, 570)
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_xee63"]
 distance = -64.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2u3gr"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s64hn"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f70pe"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hl6xe"]
+bg_color = Color(0.8235294, 0.13725491, 0.16470589, 1)
+shadow_size = 4
+
 [node name="Bossfight" type="Node2D"]
 position = Vector2(-1308, 46)
 script = ExtResource("1_iexqk")
@@ -459,28 +475,57 @@ bus = &"Music"
 [node name="Victory" type="CanvasLayer" parent="."]
 layer = 2
 
-[node name="ColorRect" type="ColorRect" parent="Victory"]
+[node name="Panel" type="Panel" parent="Victory"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 6.0
-offset_right = 4.0
-offset_bottom = 6.0
+offset_left = 304.0
+offset_top = 184.0
+offset_right = -266.0
+offset_bottom = -154.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="Victory/ColorRect"]
+[node name="Label" type="Label" parent="Victory/Panel"]
 layout_mode = 0
-offset_left = 29.0
-offset_top = 22.0
-offset_right = 1137.0
-offset_bottom = 481.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 100
-text = "You Won"
+offset_left = 40.0
+offset_top = 43.0
+offset_right = 1148.0
+offset_bottom = 502.0
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
+theme_override_fonts/font = ExtResource("4_nlhk0")
+theme_override_font_sizes/font_size = 41
+text = "To Infinity and Beyond! 
+     Thanks for Playing!"
+
+[node name="Restart" type="Button" parent="Victory/Panel"]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 219.0
+offset_right = 214.0
+offset_bottom = 256.0
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
+theme_override_fonts/font = ExtResource("4_nlhk0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2u3gr")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_s64hn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_f70pe")
+text = "Restart"
+
+[node name="Main Menu" type="Button" parent="Victory/Panel"]
+layout_mode = 0
+offset_left = 359.0
+offset_top = 219.0
+offset_right = 481.0
+offset_bottom = 256.0
+theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
+theme_override_fonts/font = ExtResource("4_nlhk0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_hl6xe")
+text = "Main Menu"
 
 [connection signal="health_changed" from="Boss" to="BossUI/ProgressBar" method="_on_boss_health_changed"]
 [connection signal="value_changed" from="BossUI/ProgressBar" to="Boss" method="_on_progress_bar_value_changed"]
 [connection signal="body_entered" from="Trigger" to="." method="_on_body_entered"]
 [connection signal="body_exited" from="Trigger" to="." method="_on_body_exited"]
+[connection signal="pressed" from="Victory/Panel/Restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="Victory/Panel/Main Menu" to="." method="_on_main_menu_pressed"]

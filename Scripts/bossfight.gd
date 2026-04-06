@@ -8,12 +8,15 @@ extends Node2D
 @onready var arena_barrier: CollisionShape2D = $ArenaBarrier/CollisionShape2D
 @onready var boss_music: AudioStreamPlayer2D = $BossMusic
 
+@onready var restart: Button = $Victory/Panel/Restart
+@onready var main_menu: Button = $"Victory/Panel/Main Menu"
+
 var previous_camera: Camera2D = null
 var players: Array[Node2D] = []
 var is_boss_defeated: bool = false
 
 @export_group("Camera Settings")
-@export var fixed_zoom: Vector2 = Vector2(0.4, 0.4) 
+@export var fixed_zoom: Vector2 = Vector2(0.4, 0.4)
 @export var smoothing_speed: float = 5.0
 
 func _ready() -> void:
@@ -21,11 +24,8 @@ func _ready() -> void:
 		push_error("MISSING NODES: Check BossCamera and CameraTarget names.")
 		return
 	
-	# Initial UI States
 	boss_ui.visible = false
 	victory_ui.visible = false
-	
-	# Camera Setup
 	boss_camera.zoom = fixed_zoom
 	boss_camera.position_smoothing_enabled = true
 	boss_camera.position_smoothing_speed = smoothing_speed
@@ -33,16 +33,18 @@ func _ready() -> void:
 	if arena_barrier:
 		arena_barrier.disabled = true
 		
-	# Connect to the custom signal we added in the Boss script
 	if boss:
 		if boss.has_signal("boss_died"):
 			boss.boss_died.connect(_on_boss_defeated)
 		else:
-			# Fallback if you haven't updated the boss script yet
 			boss.tree_exited.connect(_on_boss_defeated)
+			
+	if restart:
+		restart.pressed.connect(_on_restart_pressed)
+	if main_menu:
+		main_menu.pressed.connect(_on_main_menu_pressed)
 
 func _on_body_entered(body: Node2D) -> void:
-	# Don't trigger encounter logic if the boss is already dead
 	if is_boss_defeated:
 		return
 
@@ -53,13 +55,11 @@ func _on_body_entered(body: Node2D) -> void:
 		if boss_music and not boss_music.playing:
 			boss_music.play()
 			
-		# Trigger trap and boss logic
 		if players.size() >= 2:
 			trap_players()
 		
 		boss_ui.visible = true
 		
-		# Switch to Boss Camera
 		var current = get_viewport().get_camera_2d()
 		if current and current != boss_camera:
 			previous_camera = current
@@ -73,22 +73,31 @@ func trap_players() -> void:
 		boss.start_attack_cycle()
 
 func _on_boss_defeated() -> void:
-	# This is called via the boss_died signal
-	if is_boss_defeated: return 
+	if is_boss_defeated: return
 	
 	is_boss_defeated = true
 	print("Victory! Boss defeated.")
 	
-	# UI Changes
 	victory_ui.visible = true
 	boss_ui.visible = false
 	
-	# Stop music and unlock the arena
 	if boss_music and boss_music.playing:
 		boss_music.stop()
 		
 	if arena_barrier:
 		arena_barrier.set_deferred("disabled", true)
+
+func _on_restart_pressed() -> void:
+	if Global.respawn_point != null:
+		Global.respawn_point = null
+	
+	get_tree().reload_current_scene()
+
+func _on_main_menu_pressed() -> void:
+	if Global.respawn_point != null:
+		Global.respawn_point = null
+		
+	get_tree().change_scene_to_file("res://Scenes/Menu/main_menu.tscn")
 
 func _on_body_exited(body: Node2D) -> void:
 	if body.is_in_group("players"):

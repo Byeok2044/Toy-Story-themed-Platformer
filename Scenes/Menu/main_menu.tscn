@@ -66,19 +66,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_48xlc")
 theme_override_styles/hover = SubResource("StyleBoxFlat_48xlc")
 text = "START GAME"
 
-[node name="Controls" type="Button" parent="MainButtons"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
-theme_override_colors/font_pressed_color = Color(0.78039217, 0.67058825, 0.023529412, 1)
-theme_override_colors/font_hover_color = Color(0.78039217, 0.67058825, 0.023529412, 1)
-theme_override_fonts/font = ExtResource("3_gpijq")
-theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxFlat_48xlc")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_48xlc")
-theme_override_styles/hover = SubResource("StyleBoxFlat_48xlc")
-text = "CONTROLS
-"
-
 [node name="Settings" type="Button" parent="MainButtons"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9764706, 0.84313726, 0.10980392, 1)
@@ -255,7 +242,6 @@ text = "Fullscreen"
 script = ExtResource("6_gpijq")
 
 [connection signal="pressed" from="MainButtons/Start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="MainButtons/Controls" to="." method="_on_controls_pressed"]
 [connection signal="pressed" from="MainButtons/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="MainButtons/Credits" to="." method="_on_credits_pressed"]
 [connection signal="pressed" from="MainButtons/Exit" to="." method="_on_exit_pressed"]

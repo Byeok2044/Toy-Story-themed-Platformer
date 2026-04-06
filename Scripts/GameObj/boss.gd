@@ -1,6 +1,5 @@
 extends Area2D
 
-# Added a specific signal for the Arena script to listen to
 signal health_changed(current_health, max_health)
 signal boss_died 
 
@@ -31,13 +30,11 @@ func _ready() -> void:
 	add_to_group("enemies")
 	
 	if hp_bar:
-		# Connect to the health bar's update function
 		health_changed.connect(hp_bar._on_boss_health_changed)
 	
 	health_changed.emit(health, max_health)
 
 func _input(event: InputEvent) -> void:
-	# Debug key for testing damage
 	if event.is_action_pressed("ui_accept"):
 		take_damage(10)
 
@@ -49,7 +46,6 @@ func start_attack_cycle() -> void:
 	await get_tree().create_timer(1.5).timeout
 
 	while health > 0 and is_inside_tree():
-		# PHASE 1: Laser Bursts
 		for i in range(3):
 			if health <= 0: return
 			shoot_single_burst()
@@ -57,7 +53,6 @@ func start_attack_cycle() -> void:
 
 		await get_tree().create_timer(laser_to_spike_delay).timeout
 
-		# PHASE 2: Spikes
 		for i in range(3):
 			if health <= 0: return
 			await summon_spikes()
@@ -67,7 +62,6 @@ func start_attack_cycle() -> void:
 
 		if health <= 0: return
 
-		# PHASE 3: Weakness Phase (Adds/Batteries)
 		immune_to_normal_bullets = true
 		_active_adds = 0
 
@@ -78,7 +72,6 @@ func start_attack_cycle() -> void:
 			await get_tree().create_timer(0.25).timeout
 			if health <= 0: return
 		
-		# Boss takes damage once adds are cleared
 		take_damage(10)
 		immune_to_normal_bullets = false
 		flash_color(Color.WHITE)
@@ -164,9 +157,7 @@ func take_damage(amount: int) -> void:
 		die()
 
 func die() -> void:
-	# Alert the Arena script that the boss is gone
 	boss_died.emit()
-	# Optional: Add an explosion or death animation here
 	queue_free()
 
 func flash_color(color: Color) -> void:

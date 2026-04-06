@@ -3,7 +3,7 @@ extends Control
 var game_scene_path = "res://Scenes/Main.tscn"
 var controls_scene_path = "res://Scenes/Menu/Controls.tscn"
 var settings_scene_path = "res://Scenes/Menu/settings.tscn"
-var credits_scene_path = "res://Scenes/Credits.tscn"
+var credits_scene_path = "res://Scenes/Menu/Credits.tscn"
 
 @onready var main_buttons: VBoxContainer = $MainButtons
 @onready var settings: Panel = $Settings

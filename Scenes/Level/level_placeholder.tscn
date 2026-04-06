@@ -601,7 +601,7 @@ tile_set = SubResource("TileSet_ytae3")
 
 [node name="Woody" type="CharacterBody2D" parent="." groups=["players"]]
 process_mode = 1
-position = Vector2(7488, -1597)
+position = Vector2(7406, -1591.0001)
 scale = Vector2(3, 3)
 collision_layer = 3
 script = ExtResource("3_kxxt8")
@@ -713,7 +713,7 @@ stream = ExtResource("11_pnw4r")
 
 [node name="Buzz" type="CharacterBody2D" parent="." groups=["players"]]
 process_mode = 1
-position = Vector2(7526, -1616)
+position = Vector2(7398.0005, -1565.0001)
 scale = Vector2(3, 3)
 collision_layer = 3
 script = ExtResource("3_y7iwr")
@@ -1167,7 +1167,7 @@ position = Vector2(2250, 237)
 position = Vector2(5772, -1262)
 
 [node name="Checkpoint3" parent="." instance=ExtResource("20_wh127")]
-position = Vector2(7624, -1541)
+position = Vector2(7625, -1551)
 
 [node name="AnimatableBody2D" type="AnimatableBody2D" parent="."]
 position = Vector2(2314, -11)
